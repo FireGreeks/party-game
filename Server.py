@@ -17,7 +17,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
         response = BytesIO() #Create a Byte Buffer that will store the bytes to return
 
-        response.write("<html><p>Test</p></html>")
+        response.write("<html><p>Test</p></html>".encode())
 
         self.send_response(repnumber) #Add Response header --> 200:OK
         self.end_headers() #Close Headers --> No more headers to add
