@@ -81,10 +81,6 @@
 	<h1 id="mainTitle"><u><i>PARTY GAME PROTOTYPE</u></i></h1>
 	<div id="cards"></div>
 	
-	
-	<img src="Images/Cards/PNG/2C.png">
-	<img src="Mobile Client/Images/Cards/PNG/2C.png">
-	
 	<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 	<script>
 		
@@ -114,7 +110,7 @@
 			
 			currentCards.forEach(function(item) {
 				var img = document.createElement("img");
-				img.src = "Images/Cards/PNG/" + item + ".png";
+				img.src = "https://github.com/FireGreeks/party-game/raw/master/Images/Cards/PNG/" + item + ".png";
 				$(img).addClass("card");
 				
 				images.push(img);
