@@ -3,11 +3,17 @@ from io import BytesIO
 import json
 import re
 import os
+import random
 
 
-HOST = '0.0.0.0'
-PORT = os.environ.get("PORT", 80)
-#PORT = 8000
+SERVER = {
+    #Server information (Host and Port)
+    "HOST": '192.168.1.13',
+    #"PORT": os.environ.get("PORT", 80),
+    "PORT": 8000,
+
+    "Rooms": {}
+}
 
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
@@ -17,26 +23,129 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
         response = BytesIO() #Create a Byte Buffer that will store the bytes to return
 
-        html = open("Mobile Client/mobile_index.html")
-        response.write(html.read().encode())
+        ##--------HTML RETURNED TO HEROKU---------
+        #If a GET request is sent by the browser, under www.HOST:PORT/
+        #Send back the HTML code to display
 
-        self.send_response(repnumber) #Add Response header -->       200:OK
+        if self.path == "/":
+            html = open("Mobile Client/mobile_index.html")
+            response.write(html.read().encode())
+
+
+        ##--------SPECIAL GET REQUESTS HANDLERS----------
+        #Special GET Requests are request that cannot be handled by the automatic GET handler
+        #This can be the case if the wanted variable is before SERVER/Rooms
+        #Or if a complex response is awaited
+
+        elif self.path == "/SERVER/GetRooms":
+            response.write(json.dumps(SERVER["Rooms"]).encode())
+
+
+        ##--------GET REQUESTS HANDLER----------
+        #A GET request should send back the data asked for, provided with HOST:PORT/SERVER/XXX
+        #If the path is empty (/SERVER/), all the server data needs to sent
+        #Otherwise, if a path is provided, the asked variable should be returned
+
+        else:
+            paths = self.path.split("/")[2:] #Get requested variable path (SERVER/___GameID___/XXX)
+
+            print(paths)
+
+            currentVar = SERVER["Rooms"]
+
+            for path in paths:
+                if (isinstance(currentVar, dict) and path in currentVar.keys()) or (isinstance(currentVar, list) and currentVar.length > path):
+                    currentVar = currentVar[path]
+                else:
+                    repnumber = 404
+                    print("404: Variable not found")
+
+            if repnumber == 200:
+                response.write(json.dumps(currentVar).encode())
+
+
+        self.send_response(repnumber) #Add Response header --> 200:OK
         self.end_headers() #Close Headers --> No more headers to add
 
         self.wfile.write(response.getvalue()) #Write the buffer bytes to the returned socketWriter
 
     def do_POST(self):
 
-        response = BytesIO() #Create a mutable Byte Buffer
+        ##-------POST REQUEST SETUP---------
+        #POST Request setup code to accept all POST request sent to server
+        #It reads the POST's body data
+        #And sends back new data depending on the POST request (HOST:PORT/XXX)
 
-        repnumber = 200
+        response = BytesIO()
+
+        repnumber = 200 #Number used to send server status back
 
         content_length = int(self.headers['Content-Length']) #Get ContentLength header (length of json)
         body = self.rfile.read(content_length) #Read bytes from buffer upto "content-length" nb bytes
-        parsed_json = json.loads(body) #Transform bytes into a json dictionnary
+        parsed_json = json.loads(body)
+
+        ##-------CREATE GAME ROOM (POST by Unity)--------
+        #Takes as parameters an "id" that corresponds to the ID for players to enter
+        #This ID has been checked to be unique by the Unity client
+        #Creating a room will add an element to the SERVER.Rooms array
+        #A Room Dictionnary contains information about the server, players, and games, etc.
+
+        if self.path == "/SERVER/CreateRoom":
+            roomID = parsed_json["id"]
+            SERVER["Rooms"][roomID] = {
+                "id": roomID,
+                "nbPlayers": 0,
+                "Players": {},
+                "currentGameID":0,
+                "gameData": {}
+            }
+
+            response.write(json.dumps(SERVER["Rooms"][roomID]).encode())
+
+
+
+
+        #The following requests require the room ID
+        else:
+
+            roomID = self.path.split("/")[2]
+            if not roomID in SERVER["Rooms"].keys(): #Check if specified room ID exists
+                print("404: Room not found")
+                repnumber = 404 #Not found
+
+            else:
+
+                path = self.path[12:] #Remove /SERVER/XXXX from the path
+
+                ##-------JOIN GAME ROOM (Post by HTML Client)---------
+                #This POST Request takes as argument the name of the player.
+                #When sent, a Player Dictionnay is added to the Player list in the selected Game
+                #The ID of the Room is specified in the URL
+
+                if path == "/JoinGame":
+                    Room = SERVER["Rooms"][roomID]
+
+                    playerName = parsed_json["name"]
+                    playerID = random.randint(0, 1000)
+                    while playerID in Room["Players"].keys():
+                        playerID = random.randint(0, 1000)
+
+                    Room["nbPlayers"] += 1
+                    Room["Players"][str(playerID)] = {
+                        "name": playerName,
+                        "id": str(playerID),
+                        "partyLeader": (Room["nbPlayers"] == 1)
+                    }
+
+                    response.write(json.dumps(Room["Players"][str(playerID)]).encode())
+
+
+
+        self.send_response(repnumber) #Add Response header --> 200:OK
+        self.end_headers() #Close Headers --> No more headers to add
 
         self.wfile.write(response.getvalue()) #Write the buffer bytes to the returned socketWriter
 
-httpd = HTTPServer((HOST, int(PORT)), SimpleHTTPRequestHandler)
-print("SERVER STARTED at ", HOST, ":", PORT, sep="")
+httpd = HTTPServer((SERVER["HOST"], int(SERVER["PORT"])), SimpleHTTPRequestHandler)
+print("SERVER STARTED at ", SERVER["HOST"], ":", SERVER["PORT"], sep="")
 httpd.serve_forever()
