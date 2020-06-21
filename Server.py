@@ -8,9 +8,10 @@ import random
 
 SERVER = {
     #Server information (Host and Port)
-    "HOST": '192.168.1.13',
-    #"PORT": os.environ.get("PORT", 80),
-    "PORT": 8000,
+    #"HOST": '192.168.1.13',
+    "HOST": "0.0.0.0",
+    "PORT": os.environ.get("PORT", 80),
+    #"PORT": 8000,
 
     "Rooms": {}
 }
