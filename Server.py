@@ -28,7 +28,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         #If a GET request is sent by the browser, under www.HOST:PORT/
         #Send back the HTML code to display
 
-        if self.path == "/":
+        if self.path == "/play":
             html = open("Mobile Client/menuIndex.html")
             response.write(html.read().encode())
 
