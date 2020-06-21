@@ -28,7 +28,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         #Send back the HTML code to display
 
         if self.path == "/":
-            html = open("Mobile Client/mobile_index.html")
+            html = open("Mobile Client/menuIndex.html")
             response.write(html.read().encode())
 
 
@@ -38,7 +38,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         #Or if a complex response is awaited
 
         elif self.path == "/SERVER/GetRooms":
-            response.write(json.dumps(SERVER["Rooms"]).encode())
+            response.write(json.dumps(list(SERVER["Rooms"].keys())).encode())
 
 
         ##--------GET REQUESTS HANDLER----------
@@ -48,8 +48,6 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
         else:
             paths = self.path.split("/")[2:] #Get requested variable path (SERVER/___GameID___/XXX)
-
-            print(paths)
 
             currentVar = SERVER["Rooms"]
 
@@ -82,6 +80,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
         content_length = int(self.headers['Content-Length']) #Get ContentLength header (length of json)
         body = self.rfile.read(content_length) #Read bytes from buffer upto "content-length" nb bytes
+
         parsed_json = json.loads(body)
 
         ##-------CREATE GAME ROOM (POST by Unity)--------
@@ -134,7 +133,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
                     Room["Players"][str(playerID)] = {
                         "name": playerName,
                         "id": str(playerID),
-                        "partyLeader": (Room["nbPlayers"] == 1)
+                        "isPartyLeader": (Room["nbPlayers"] == 1)
                     }
 
                     response.write(json.dumps(Room["Players"][str(playerID)]).encode())
