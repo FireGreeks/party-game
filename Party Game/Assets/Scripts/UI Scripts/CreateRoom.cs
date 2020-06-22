@@ -118,7 +118,7 @@ public class CreateRoom : MonoBehaviour
                 foreach (JSONNode player in players)
                 {
                     //Display room changes
-                    playerList.text += "- " + player["name"].ToString() + (player["isPartyLeader"] ? "    VIP" : "") + "\n";
+                    playerList.text += "- " + player["name"].ToString() + (player["isPartyLeader"] ? "    VIP" : "") + "\n" ;
 
                 }
                     

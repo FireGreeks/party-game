@@ -8,15 +8,27 @@ import random
 
 SERVER = {
     #Server information (Host and Port)
-    #"HOST": '192.168.1.13',
-    "HOST": "0.0.0.0",
-    "PORT": os.environ.get("PORT", 80),
-    #"PORT": 8000,
+    "HOST": '192.168.1.13',
+    #"HOST": "0.0.0.0",
+    #"PORT": os.environ.get("PORT", 80),
+    "PORT": 8000,
 
     "Rooms": {}
 }
 
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
+
+
+    def do_OPTIONS(self):
+        self.send_response(200, "ok")
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+        self.send_header("Access-Control-Allow-Headers", "X-Requested-With, Content-Type, Content-Length")
+
+        print(self.headers)
+
+        self.do_POST()
+
 
     def do_GET(self):
 
@@ -64,6 +76,10 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
 
         self.send_response(repnumber) #Add Response header --> 200:OK
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Headers", "*")
+        self.send_header("Access-Control-Allow-Methods", "OPTIONS")
+
         self.end_headers() #Close Headers --> No more headers to add
 
         self.wfile.write(response.getvalue()) #Write the buffer bytes to the returned socketWriter
@@ -79,8 +95,11 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
         repnumber = 200 #Number used to send server status back
 
-        content_length = int(self.headers['Content-Length']) #Get ContentLength header (length of json)
-        body = self.rfile.read(content_length) #Read bytes from buffer upto "content-length" nb bytes
+        if "Content-Length" in self.headers.keys() or "content-length" in self.headers.keys():
+            content_length = int(self.headers['Content-Length']) #Get ContentLength header (length of json)
+            body = self.rfile.read(content_length) #Read bytes from buffer upto "content-length" nb bytes
+        else:
+            body = self.rfile.read();
 
         parsed_json = json.loads(body)
 
@@ -142,6 +161,10 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
 
         self.send_response(repnumber) #Add Response header --> 200:OK
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Headers", "*")
+        self.send_header("Access-Control-Allow-Methods", "*")
+
         self.end_headers() #Close Headers --> No more headers to add
 
         self.wfile.write(response.getvalue()) #Write the buffer bytes to the returned socketWriter

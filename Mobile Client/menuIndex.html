@@ -74,33 +74,33 @@
 	<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 	<script>
 		
-		//const serverURL = "http://192.168.1.13:8000/SERVER"
-		const serverURL = "https://party-game-mobile.herokuapp.com/SERVER"
+		const serverURL = "http://192.168.1.13:8000/SERVER"
+		//const serverURL = "https://party-game-mobile.herokuapp.com/SERVER"
+		
+		var name;
+		var gameID;
 		
 		function joinRoom() {
-			var name = document.getElementById("name").value;
-			var gameID = document.getElementById("gameID").value;
+			name = document.getElementById("name").value;
+			gameID = document.getElementById("gameID").value;
 			
 			//Check if gameID is valid
-			/*GetRequest(serverURL + "/GetRooms", function() {
+			GetRequest(serverURL + "/GetRooms", function() {
 				if (this.readyState == 4 && this.status == 200) {
 					const gameIDsAvailable = JSON.parse(this.responseText);
 					console.log(gameIDsAvailable);
+					
+					if (gameIDsAvailable.includes(gameID)) {
+						PostRequest(serverURL + "/JoinRoom", '{"name":"' + name + '"}', function() {
+							console.log("Joined Game")
+						});
+					}
+					else {
+						alert("Room not found");
+					}
 				}
 
-			});*/
-			
-			var xmlHttp = new XMLHttpRequest();
-			
-			xmlHttp.onload = function() {
-				if (this.readyState == 4 && this.status == 200) {
-					const gameIDsAvailable = JSON.parse(this.responseText);
-					console.log(gameIDsAvailable);
-				}
-
-			};
-			xmlHttp.open( "GET", serverURL + "/GetRooms", true ); // false for synchronous request
-			xmlHttp.send();
+			});
 
 		}
 		
@@ -110,6 +110,22 @@
 			xmlHttp.onreadystatechange = func;
 			xmlHttp.open( "GET", uri, true ); // false for synchronous request
 			xmlHttp.send(null);
+		}
+		
+		function PostRequest(uri, toSend, func) {
+			var xmlHttp = new XMLHttpRequest();
+			xmlHttp.open("POST", uri, true);
+
+			xmlHttp.setRequestHeader("Content-Type", "application/json");
+			//xmlHttp.setRequestHeader("Length", (new TextEncoder().encode(toSend)).length)
+			
+			xmlHttp.onreadystatechange = function() {
+				if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+					func();
+				}
+			}
+			console.log(toSend);
+			xmlHttp.send(toSend);
 		}
 		
 	</script>
