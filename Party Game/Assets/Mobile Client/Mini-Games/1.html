@@ -141,7 +141,7 @@
 					}, 950);
 					
 					//Send chosen card to server
-					PostRequest(serverURL + "/" + window.location.substr(window.location.length - 4) + "/AlterGameData", JSON.stringify({"cardHistory": ["ADD_ARRAY", currentCards[index]]}), function() {
+					PostRequest(serverURL + "/" + window.location.href.substr(window.location.href.length - 4) + "/AlterGameData", JSON.stringify({"cardHistory": ["ADD_ARRAY", currentCards[index]]}), function() {
 						console.log("Card sent to server")
 					})
 					
