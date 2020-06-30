@@ -141,7 +141,7 @@
 					}, 950);
 					
 					//Send chosen card to server
-					PostRequest(serverURL + "/" + localStorage.roomID + "AlterGameData", JSON.stringify({"cardHistory": ["ADD_ARRAY", currentCards[index]]}), function() {
+					PostRequest(serverURL + "/" + localStorage.roomID + "/AlterGameData", JSON.stringify({"cardHistory": ["ADD_ARRAY", currentCards[index]]}), function() {
 						console.log("Card sent to server")
 					})
 					

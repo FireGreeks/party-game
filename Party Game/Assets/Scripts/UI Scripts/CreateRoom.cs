@@ -137,7 +137,7 @@ public class CreateRoom : MonoBehaviour
 
     private IEnumerator StartGame()
     {
-        var webRequest = new UnityWebRequest("https://party-game-mobile.herokuapp.com/SERVER/6S6L/SelectGame");
+        var webRequest = new UnityWebRequest(ServerInfo.RoomURL + "/SelectGame");
         webRequest.method = "POST";
         webRequest.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes("{\"gameID\":1}"));
         webRequest.downloadHandler = new DownloadHandlerBuffer();
