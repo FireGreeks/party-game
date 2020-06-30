@@ -43,7 +43,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         decodedPath = self.path.split("/")
 
         if self.path == "/play":
-            html = open("Mobile Client/joinRoom.html")
+            html = open("Party Game/Assets/Mobile Client/joinRoom.html")
             response.write(html.read().encode())
 
         #Return Room state
