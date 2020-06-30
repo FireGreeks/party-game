@@ -8,7 +8,7 @@ import random
 
 SERVER = {
     #Server information (Host and Port)
-    "HOST": '192.168.1.13',
+    "HOST": '127.0.0.1',
     #"HOST": "0.0.0.0",
     #"PORT": os.environ.get("PORT", 80),
     "PORT": 8000,
@@ -22,12 +22,10 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
     def do_OPTIONS(self):
         self.send_response(200, "ok")
         self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-        self.send_header("Access-Control-Allow-Headers", "X-Requested-With, Content-Type, Content-Length")
-
-        print(self.headers)
-
-        self.do_POST()
+        self.send_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
+        self.send_header("Access-Control-Allow-Headers", "X-Requested-With")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.end_headers()
 
 
     def do_GET(self):
@@ -40,9 +38,28 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         #If a GET request is sent by the browser, under www.HOST:PORT/
         #Send back the HTML code to display
 
+        decodedPath = self.path.split("/")
+
         if self.path == "/play":
-            html = open("Mobile Client/menuIndex.html")
+            html = open("Mobile Client/joinRoom.html")
             response.write(html.read().encode())
+
+        #Return Room state
+        elif decodedPath[1] == "play":
+            roomID = decodedPath[2]
+
+            #Check if room has been created
+            if roomID in SERVER["Rooms"].keys():
+
+                #Return the current game played in this room
+                currentGameID = SERVER["Rooms"][roomID]["currentGameID"]
+
+                html = open("Mobile Client/Mini-Games/" + currentGameID + ".html")
+                response.write(html.read().encode())
+
+            else:
+                repnumber = 404
+                print("404: Room not found, sending back to joinRoom.html ({{server}}/play)") #TO-DO
 
 
         ##--------SPECIAL GET REQUESTS HANDLERS----------
@@ -99,7 +116,15 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             content_length = int(self.headers['Content-Length']) #Get ContentLength header (length of json)
             body = self.rfile.read(content_length) #Read bytes from buffer upto "content-length" nb bytes
         else:
-            body = self.rfile.read();
+            #Read the file character by character
+            body = "";
+            currentCharacter = 1;
+            while not "*" in body:
+                print(currentCharacter)
+                body = self.rfile.read(currentCharacter)
+                currentCharacter += 1
+            print(body)
+
 
         parsed_json = json.loads(body)
 
@@ -141,7 +166,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
                 #When sent, a Player Dictionnay is added to the Player list in the selected Game
                 #The ID of the Room is specified in the URL
 
-                if path == "/JoinGame":
+                if path == "/JoinRoom":
                     Room = SERVER["Rooms"][roomID]
 
                     playerName = parsed_json["name"]
@@ -157,6 +182,19 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
                     }
 
                     response.write(json.dumps(Room["Players"][str(playerID)]).encode())
+
+
+                ##-------SELECT MINI-GAME (Post by Unity Client)---------
+                #This POST Request takes as argument the ID (int) of the wished mini-game
+                #When sent, the SERVER/Room/currentGameID is set to sent ID
+
+                elif path == "/SelectGame":
+                    Room = SERVER["Rooms"][roomID]
+
+                    gameID = parsed_json["gameID"]
+                    Room["currentGameID"] = gameID
+
+
 
 
 
