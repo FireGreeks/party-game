@@ -5,7 +5,7 @@ using UnityEngine.Networking;
 
 public static class ServerInfo
 {
-    public static string ServerURL = "http://192.168.1.13:8000/SERVER";
+    public static string ServerURL = "http://127.0.0.1:8000/SERVER";
     public static string RoomURL;
     public static bool hasRoom = false;
 }
