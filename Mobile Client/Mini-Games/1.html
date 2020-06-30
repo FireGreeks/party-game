@@ -87,7 +87,7 @@
 		var cardTypes = ["C", "D", "H", "S"];
 		var cardNumbers = ["J", "Q", "K"];
 		
-		var images = []
+		var images = [];
 		
 		var currentCards = [];
 		var selectedCard = -1;
@@ -132,11 +132,16 @@
 				else {
 					selectedCard = -1;
 					$(el.target).addClass("chosen");
+					
 					images.splice(index, 1);
+					currentCards.splice(index, 1);
 					
 					setTimeout(function() {
 						$(el.target).remove();
 					}, 950);
+					
+					//Send chosen card to server
+					PostRequest()
 				}
 			});
 		}

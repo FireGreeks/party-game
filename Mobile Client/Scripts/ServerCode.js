@@ -1,3 +1,5 @@
+//const serverURL = "http://127.0.0.1:8000/SERVER"
+const serverURL = "https://party-game-mobile.herokuapp.com/SERVER"
 
 
 function GetRequest(uri, func) {
