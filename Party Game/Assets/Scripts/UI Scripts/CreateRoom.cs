@@ -125,4 +125,31 @@ public class CreateRoom : MonoBehaviour
             }
         }
     }
+
+
+    //The following code is only used as a protoype
+    public void SelectGame()
+    {
+        StartCoroutine(StartGame());
+    }
+
+    private IEnumerator StartGame()
+    {
+        var webRequest = new UnityWebRequest("https://party-game-mobile.herokuapp.com/SERVER/6S6L/SelectGame");
+        webRequest.method = "POST";
+        webRequest.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes("{\"gameID\":1}"));
+        webRequest.downloadHandler = new DownloadHandlerBuffer();
+        webRequest.SetRequestHeader("Content-Type", "application/json");
+
+        // Request and wait for the desired page.
+        yield return webRequest.SendWebRequest();
+
+        if (webRequest.isNetworkError)
+            Debug.Log("Error: " + webRequest.error);
+        else
+        {
+            Debug.Log("Game Started");
+        }
+        
+    }
 }
