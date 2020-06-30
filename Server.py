@@ -5,13 +5,15 @@ import re
 import os
 import random
 
+import MiniGamesDirector
+
 
 SERVER = {
     #Server information (Host and Port)
-    #"HOST": '127.0.0.1',
-    "HOST": "0.0.0.0",
-    "PORT": os.environ.get("PORT", 80),
-    #"PORT": 8000,
+    "HOST": '127.0.0.1',
+    #"HOST": "0.0.0.0",
+    #"PORT": os.environ.get("PORT", 80),
+    "PORT": 8000,
 
     "Rooms": {}
 }
@@ -153,6 +155,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             else:
 
                 path = self.path[12:] #Remove /SERVER/XXXX from the path
+                Room = SERVER["Rooms"][roomID]
 
                 ##-------JOIN GAME ROOM (Post by HTML Client)---------
                 #This POST Request takes as argument the name of the player.
@@ -160,7 +163,6 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
                 #The ID of the Room is specified in the URL
 
                 if path == "/JoinRoom":
-                    Room = SERVER["Rooms"][roomID]
 
                     playerName = parsed_json["name"]
                     playerID = random.randint(0, 1000)
@@ -182,13 +184,81 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
                 #When sent, the SERVER/Room/currentGameID is set to sent ID
 
                 elif path == "/SelectGame":
-                    Room = SERVER["Rooms"][roomID]
-
                     gameID = parsed_json["gameID"]
                     Room["currentGameID"] = gameID
 
+                    Room["gameData"] = MiniGamesDirector.SetupGames(gameID, Room["gameData"].copy())
 
 
+                ##-------ALTER GAME DATA (Post by Unity and HTML Client)---------
+                #This POST Request takes as argument the variable to change, the action to take and the value
+                #When sent, the Room/gameData is set accordingly
+
+                elif path == "/AlterGameData":
+
+                    gameData = Room["gameData"].copy() #If error, revert to orginal
+
+                    #Loop through all the variables to chnage (stored in a dictionnary)
+                    for variable, item in parsed_json.items():
+                        action = item[0]
+                        value = item[1]
+
+                        if not variable in gameData.keys():
+                            repnumber = 400
+                            print("400: Bad request, variable", variable," is non-existent")
+                            break
+
+                        #Check which action it is supposed to take
+                        if action == "SET":
+                            gameData[variable] = value
+
+                        elif action == "ADD":
+                            if type(gameData[variable]) in [int, float, str]:
+                                try:
+                                    gameData[variable] += value
+                                except:
+                                    repnumber = 400
+                                    print("400: Bad request, uncompatibilty between variable's' and given value's types'")
+                            else:
+                                repnumber = 400
+                                print("400: Bad request, type of variable isn't compatible with demanded action'")
+
+
+                        elif action == "SUB":
+                            if type(gameData[variable]) in [int, float]:
+                                gameData[variable] -= value
+                            else:
+                                repnumber = 400
+                                print("400: Bad request, type of variable isn't compatible with demanded action'")
+
+
+                        elif action == "ADD_ARRAY":
+                            if type(gameData[variable]) == list:
+                                gameData[variable].append(value)
+                            else:
+                                repnumber = 400
+                                print("400: Bad request, type of variable isn't compatible with demanded action'")
+
+
+                        elif action == "SET_DICT":
+                            if type(gameData[variable]) == dict:
+                                gameData[variable][value[0]] = value[1]
+                            else:
+                                repnumber = 400
+                                print("400: Bad request, type of variable isn't compatible with demanded action'")
+
+
+                        elif action == "DEL":
+                            if type(gameData[variable]) in [list, dict]:
+                                gameData[variable].pop(value)
+                            else:
+                                repnumber = 400
+                                print("400: Bad request, type of variable isn't compatible with demanded action'")
+
+
+                    if repnumber == 200:
+                        Room["gameData"] = gameData.copy()
+                        response.write(json.dumps(Room["gameData"]).encode())
 
 
         self.send_response(repnumber) #Add Response header --> 200:OK
