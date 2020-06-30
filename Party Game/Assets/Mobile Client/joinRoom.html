@@ -91,6 +91,7 @@
 						PostRequest(serverURL + "/" + roomID + "/JoinRoom", JSON.stringify({"name": name}), function() {
 							console.log("Joined Game");
 							
+							localStorage.roomID = roomID;
 							window.location.href += "/" + roomID
 						});
 					}
