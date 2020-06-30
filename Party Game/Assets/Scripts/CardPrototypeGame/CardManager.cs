@@ -49,7 +49,9 @@ public class CardManager : MonoBehaviour
 
                     GameObject newCard = Instantiate(cardGB, cardSpawn);
 
-                    UnityWebRequest www = UnityWebRequestTexture.GetTexture("https://github.com/FireGreeks/party-game/raw/master/Party%20Game/Assets/Mobile%20Client/Images/Cards/PNG/" + cardHistory[cardHistory.Count - i] + ".png");
+                    string path = "file://" + Application.dataPath + "/Mobile Client/Images/Cards/PNG/" + cardHistory[cardHistory.Count - i] + ".png";
+                    Debug.Log(path);
+                    UnityWebRequest www = UnityWebRequestTexture.GetTexture(path);
                     yield return www.SendWebRequest();
 
                     if (www.isNetworkError)
