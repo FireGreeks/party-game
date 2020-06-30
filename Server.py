@@ -59,7 +59,10 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
             else:
                 repnumber = 404
-                print("404: Room not found, sending back to joinRoom.html ({{server}}/play)") #TO-DO
+                print("404: Room not found, sending back to joinRoom.html ({{server}}/play)")
+
+                html = open("Mobile Client/joinRoom.html")
+                response.write(html.read().encode())
 
 
         ##--------SPECIAL GET REQUESTS HANDLERS----------
@@ -112,18 +115,8 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
         repnumber = 200 #Number used to send server status back
 
-        if "Content-Length" in self.headers.keys() or "content-length" in self.headers.keys():
-            content_length = int(self.headers['Content-Length']) #Get ContentLength header (length of json)
-            body = self.rfile.read(content_length) #Read bytes from buffer upto "content-length" nb bytes
-        else:
-            #Read the file character by character
-            body = "";
-            currentCharacter = 1;
-            while not "*" in body:
-                print(currentCharacter)
-                body = self.rfile.read(currentCharacter)
-                currentCharacter += 1
-            print(body)
+        content_length = int(self.headers['Content-Length']) #Get ContentLength header (length of json)
+        body = self.rfile.read(content_length) #Read bytes from buffer upto "content-length" nb bytes
 
 
         parsed_json = json.loads(body)
