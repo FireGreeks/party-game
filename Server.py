@@ -54,7 +54,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
                 #Return the current game played in this room
                 currentGameID = SERVER["Rooms"][roomID]["currentGameID"]
 
-                html = open("Mobile Client/Mini-Games/" + currentGameID + ".html")
+                html = open("Mobile Client/Mini-Games/" + str(currentGameID) + ".html")
                 response.write(html.read().encode())
 
             else:
