@@ -56,14 +56,14 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
                 #Return the current game played in this room
                 currentGameID = SERVER["Rooms"][roomID]["currentGameID"]
 
-                html = open("Mobile Client/Mini-Games/" + str(currentGameID) + ".html")
+                html = open("Party Game/Assets/Mobile Client/Mini-Games/" + str(currentGameID) + ".html")
                 response.write(html.read().encode())
 
             else:
                 repnumber = 404
                 print("404: Room not found, sending back to joinRoom.html ({{server}}/play)")
 
-                html = open("Mobile Client/joinRoom.html")
+                html = open("Party Game/Assets/Mobile Client/joinRoom.html")
                 response.write(html.read().encode())
 
 
