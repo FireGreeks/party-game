@@ -9,11 +9,13 @@ using DG.Tweening;
 public class CardManager : MonoBehaviour
 {
     [SerializeField] int getFrequency = 50;
+    [SerializeField] float offsetYPerCard = .2f;
     [SerializeField] GameObject cardGB;
     [SerializeField] Transform cardSpawn;
     [SerializeField] Transform cardGoal;
 
     private List<string> playedCards = new List<string>();
+    private float currentYOffset = 0;
 
     private int frame = 0;
     // Update is called once per frame
@@ -57,7 +59,8 @@ public class CardManager : MonoBehaviour
                         Texture2D txt = ((DownloadHandlerTexture)www.downloadHandler).texture;
                         newCard.transform.GetChild(0).GetComponent<SpriteRenderer>().sprite = Sprite.Create(txt, new Rect(0, 0, txt.width, txt.height), new Vector2(0, 0), 100.0f);
 
-                        newCard.transform.DOMove(cardGoal.position, .5f);
+                        newCard.transform.DOMove(cardGoal.position + new Vector3(0, currentYOffset, 0), .5f);
+                        currentYOffset += offsetYPerCard;
                     }
                 }
             }

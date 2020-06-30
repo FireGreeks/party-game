@@ -5,6 +5,8 @@ using UnityEngine.Networking;
 using TMPro;
 
 using SimpleJSON;
+using UnityEngine.SceneManagement;
+
 
 public class CreateRoom : MonoBehaviour
 {
@@ -149,6 +151,7 @@ public class CreateRoom : MonoBehaviour
         else
         {
             Debug.Log("Game Started");
+            SceneManager.LoadScene(1);
         }
         
     }
