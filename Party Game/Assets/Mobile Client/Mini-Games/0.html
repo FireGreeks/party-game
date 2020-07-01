@@ -33,7 +33,7 @@
 			background-image:
 				linear-gradient(to left, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1), rgba(255, 255, 255, 1));
 			border-radius: 25px;
-			background-size: 100vw;
+			background-size: 100%;
 			
 			padding-top: 1vh;
 			font-size: 3vh;
@@ -42,8 +42,25 @@
 		}
 		
 		.arrowSelect {
+			-webkit-transition: .5s;
+			-moz-transition: .5s;
+			-ms-transition: .5s;
+			-o-transition: .5s;
+			transition: .5s;
+		
 			width: 3vw;
 			margin-left: 3vw;
+			transform: rotation(0deg);
+		}
+		
+		.arrowSelect.selected {
+			-webkit-transition: .5s;
+			-moz-transition: .5s;
+			-ms-transition: .5s;
+			-o-transition: .5s;
+			transition: .5s;
+			
+			transform: rotate(90deg);
 		}
 		
 		.gameDetails {
@@ -79,6 +96,14 @@
 			font-family:Lucida Console,arial,helvetica;
 			margin-left: 2vw;
 		}
+		
+		.playGame {
+			background-color: #449ec2;
+			color: white;
+			border-radius: 25px;
+			font-size: 4vw;
+			margin-right: 3vw;
+		}
 	
 	</style>
 </head>
@@ -109,6 +134,9 @@
 					velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat 
 					non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 				</p>
+				<div style="text-align:right">
+					<button class="playGame" onclick="playGame()">PLAY ></button>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -154,15 +182,18 @@
 						$(".gameSelect").click(function() {
 				
 							if (selectedGame != 0) {
-								var selector = $("#partyLeaderSeletion").children().eq(selectedGame - 1).children().eq(1);				
-								selector.css("height", ".5%");
+								var selector = $("#partyLeaderSeletion").children().eq(selectedGame - 1).children();				
+								selector.eq(1).css("height", ".5%");
+								
+								selector.eq(0).children().eq(0).removeClass("selected");
 							}
 						
 							games = $("#partyLeaderSeletion").children();
 							theGame = $(this).parent();			
 							selectedGame = games.index(theGame) + 1;
 							
-							$(this).next().css("height", (Array.prototype.reduce.call($(this).next()[0].childNodes, function(p, c) {return p + (c.offsetHeight || 0);}, 40)) + 'px');
+							$(this).next().css("height", (Array.prototype.reduce.call($(this).next()[0].childNodes, function(p, c) {return p + (c.offsetHeight || 0);}, 25)) + 'px');
+							$(this).children().eq(0).addClass("selected");
 						});
 					});
 				}
@@ -179,6 +210,16 @@
 			});
 					
 		}
+		
+		
+		function playGame() {
+			//Send POST
+			PostRequest(GetRoomPath() + "/SelectGame", JSON.stringify({"gameID": selectedGame}), function(res) {
+				window.location.reload();
+			});
+		}
+		
+		
 		
 		function fixedSizes()
 		{
