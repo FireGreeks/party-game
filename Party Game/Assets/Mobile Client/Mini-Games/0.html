@@ -121,7 +121,7 @@
 	</div>
 	
 	<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/gh/FireGreeks/party-game@master/Party%20Game/Assets/Mobile%20Client/Scripts/ServerCode.js"></script>
+	<script src="https://cdn.jsdelivr.net/gh/FireGreeks/party-game@1.0.0/Party%20Game/Assets/Mobile%20Client/Scripts/ServerCode.js"></script>
 	<script>
 		
 		var player;
@@ -151,7 +151,7 @@
 							console.log(game.find(".gameSelect").css("background-image"));
 							
 							game.find(".gameTitle").html(el["name"]);
-							game.find(".gameSelect").css("background-image", "linear-gradient(to left, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1), rgba(255, 255, 255, 1)), url('" + CDN_URL + "Images/GameSelection/" + el["backgroundImage"] + "')")
+							game.find(".gameSelect").css("background-image", "linear-gradient(to left, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1), rgba(255, 255, 255, 1)), url('" + CDN_URL + "/Images/GameSelection/" + el["backgroundImage"] + "')")
 							game.find(".nbPlayers").html(el["nbPlayers"]);
 							game.find(".timeDuration").html(el["timeDuration"])
 							
