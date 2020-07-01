@@ -110,7 +110,7 @@
 		window.onload = function() {
 			//Check if on Heroku, if URL is /play, if not redirect to italic
 			var href = window.location.href
-			if (serverURL.includes(".com") && href.substr(href.length - 5) != "/play") {
+			if (window.location.href.includes(".com") && href.substr(href.length - 5) != "/play") {
 				window.location.href = href.substr(0, href.length - 5)
 			}
 		}
