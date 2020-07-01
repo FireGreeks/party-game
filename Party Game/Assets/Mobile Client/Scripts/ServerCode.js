@@ -1,7 +1,7 @@
 const serverURL = "http://127.0.0.1:8000/SERVER"
 //const serverURL = "https://party-game-mobile.herokuapp.com/SERVER"
 
-const CDN_URL = "https://cdn.jsdelivr.net/gh/FireGreeks/party-game@latest/Party%20Game/Assets/Mobile%20Client";
+const CDN_URL = "https://cdn.jsdelivr.net/gh/FireGreeks/party-game@master/Party%20Game/Assets/Mobile%20Client";
 
 
 function GetRequest(uri, func) {
