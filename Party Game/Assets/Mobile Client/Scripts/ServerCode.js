@@ -30,5 +30,8 @@ function PostRequest(uri, toSend, func) {
 }
 
 function GetRoomPath() {
-	return serverURL + "/" + window.location.href.substr(window.location.href.length - 4);
+	if (window.location.href.includes(".com"))
+		return serverURL + "/" + window.location.href.substr(window.location.href.length - 4);
+	else
+		return serverURL + "/H8JK"
 }
