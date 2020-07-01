@@ -29,8 +29,7 @@
 			height: 10%;
 			
 			background-image:
-				linear-gradient(to left, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1), rgba(255, 255, 255, 1)),
-				url('cardBackground.jpg');
+				linear-gradient(to left, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1), rgba(255, 255, 255, 1));
 			border-radius: 25px;
 			
 			padding-top: 1%;
@@ -95,17 +94,17 @@
 	
 	<div id="partyLeaderSeletion"></div>
 	
-	<div style="display:hidden" id="gameListCloning">
+	<div style="display:none" id="gameListCloning">
 		<div class="game">
 			<div class="gameSelect">
 				<img class="arrowSelect" src="arrow.png">
-				<span class="gameTitle">1: Prototype Card Game</span>
+				<span class="gameTitle">Title</span>
 				<div class="gameDetails">
 					<img class="arrowSelect" src="nbPlayers.png">
-					<span class="nbPlayers">1-2 Players</span><br/>
+					<span class="nbPlayers">x-x Players</span><br/>
 					
 					<img class="arrowSelect" src="time.png">
-					<span class="timeDuration">10-15 min</span><br/>
+					<span class="timeDuration">x-x mins</span><br/>
 				</div>
 			</div>
 			<div class="gameDescription">
@@ -124,6 +123,9 @@
 	<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/gh/FireGreeks/party-game@latest/Party%20Game/Assets/Mobile%20Client/Scripts/ServerCode.js"></script>
 	<script>
+		
+		const CDN_URL = "https://cdn.jsdelivr.net/gh/FireGreeks/party-game@latest/Party%20Game/Assets/Mobile%20Client";
+		const CDN_URL_local = "C:/Users/theod/OneDrive/Documents/Fun/Programming/Ungoing_Projects/party-game/Party Game/Assets/Mobile Client";
 		
 		var player;
 		
@@ -144,16 +146,19 @@
 					GetRequest(CDN_URL + "/Scripts/gamesInfo.json", function(res) {
 						var games = JSON.parse(res.responseText);
 						
-						games.foreach(function(el) {
+						games.forEach(function(el) {
 							var game = $("#gameListCloning").children().eq(0).clone();
 							
 							game.appendTo($("#partyLeaderSeletion"));
 							
-							game.children(".gameTitle").html(el["name"]);
-							game.children(".background-image", 
-								"linear-gradient(to left, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1), rgba(255, 255, 255, 1)), url('" + CDN_URL + "Images/GameSelection/" + el["backgroundImage"] + "');")
-							game.children(".nbPlayers").html(el["nbPlayers"]);
-							game.children(".timeDuration").html(el["timeDuration"])
+							console.log(game.find(".gameSelect").css("background-image"));
+							
+							game.find(".gameTitle").html(el["name"]);
+							game.find(".gameSelect").css("background-image", "linear-gradient(to left, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1), rgba(255, 255, 255, 1)), url('" + CDN_URL_local + "/Images/GameSelection/" + el["backgroundImage"] + "')")
+							game.find(".nbPlayers").html(el["nbPlayers"]);
+							game.find(".timeDuration").html(el["timeDuration"])
+							
+							console.log(game.find(".gameSelect").css("background-image"));
 						});
 					});
 				}
