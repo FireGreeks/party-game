@@ -1,3 +1,5 @@
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+
 <html>
 <head>
 	<style>
@@ -10,16 +12,16 @@
 		#mainTitle 
 		{
 			text-align: center;
-			margin-top: 10%;
-			font-size: 400%;
+			margin-top: 10vh;
+			font-size: 7vw;
 			font-family:courier,arial,helvetica;
 			color: white;
 		}
 		
 		p 
 		{
-			font-size: 250%;
-			margin-left: 5%;
+			font-size: 4vw;
+			margin-left: 5vw;
 			font-family:courier,arial,helvetica;
 			color: white;
 		}
@@ -30,11 +32,11 @@
 			display:block;
 			border:none;
 			border-bottom:1px solid #ccc;
-			margin-left: 5%;
-			width:85%;
-			height: 3%;
-			font-size:80%;
-			margin-top: 1%;
+			margin-left: 5vw;
+			width:75vw;
+			height: 3vh;
+			font-size:2vw;
+			margin-top: 1vh;
 			font-family:courier,arial,helvetica;
 		}
 		
@@ -47,11 +49,11 @@
 		
 		.buttonSubmit 
 		{
-			height:3%;
-			width: 30%;	
-			font-size:80%;
+			height:3vh;
+			width: 30vw;	
+			font-size:3vw;
 			font-family:courier,arial,helvetica;
-			margin-top: 2%;
+			margin-top: 2vh;
 		}
 
 		
@@ -76,6 +78,8 @@
 	<script>		
 		var name;
 		var roomID;
+		
+		var height;
 		
 		function joinRoom() {
 			name = document.getElementById("name").value;
@@ -102,7 +106,6 @@
 				}
 
 			});
-
 		}
 		
 		window.onload = function() {
@@ -112,6 +115,74 @@
 				window.location.href = href.substr(0, href.length - 5)
 			}
 		}
+		
+		function fixedSizes()
+		{
+			var w = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+			var h = window.innerHeight || document.documentElement.clientHeight || document.body.clientheight;
+			var units = {vw: w / 100, vh: h / 100, vmin: (w > h ? h : w) / 100, vmax: (w > h ? w : h) / 100};
+			var sheet = addSheet();
+
+			for (var s = 0; s < document.styleSheets.length - 1; s++)
+			{
+				var rules = document.styleSheets[s].cssRules || document.styleSheets[s].rules;
+
+				for (var r = 0; r < rules.length; r++)
+				{
+					var rule = rules[r];
+
+					if (rule.type == CSSRule.STYLE_RULE)
+					{
+						var selector = rule.selectorText;
+						var styles = rule.style.cssText.match(/[\w-]+\s?:\s?-?[\d\.]+(vw|vh|vmin|vmax)/g);
+
+						for (var t = 0; styles && t < styles.length; t++)
+						{
+							var style = styles[t];
+							var prop = style.match(/^[\w-]*/)[0];
+							var unit = style.match(/(vw|vh|vmin|vmax)$/)[0];
+							var val = parseFloat(style.match(/-?[\d\.]+(vw|vh|vmin|vmax)/)[0]) * units[unit];
+							addStyle(sheet, selector, prop + ": " + val + "px");
+						}
+					}
+				}
+			}
+
+			function addSheet()
+			{
+				var s = document.createElement("style");
+				s.type = "text/css";
+				s.rel = "stylesheet";
+				s.media = "screen";
+				document.getElementsByTagName("head")[0].appendChild(s);
+				return(document.styleSheets[document.styleSheets.length - 1]);
+			}
+
+			function addStyle(sheet, selector, style)
+			{
+				if (sheet.addRule)
+				{
+					sheet.addRule(selector, style);
+				}
+				else if (sheet.insertRule)
+				{
+					sheet.insertRule(selector + " { " + style + " }");
+				}
+			}       
+		}
+
+		if (CSSRule)
+		{
+			if (document.addEventListener)
+			{
+				document.addEventListener("DOMContentLoaded", fixedSizes, false);
+			}
+			else if (window.attachEvent)
+			{
+				window.attachEvent("onload", fixedSizes);
+			}
+		}
+	
 		
 	</script>
 </body>

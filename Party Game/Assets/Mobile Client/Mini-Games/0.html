@@ -1,3 +1,4 @@
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
 <html>
 <head>
 	<style>
@@ -8,8 +9,8 @@
 	
 		#mainTitle {
 			text-align: center;
-			margin-top: 10%;
-			font-size: 400%;
+			margin-top: 10vh;
+			font-size: 8vw;
 			font-family:courier,arial,helvetica;
 			color: white;
 		}
@@ -17,35 +18,37 @@
 		
 		#partyLeaderSeletion {
 			display: none;
+			overflow-y: scroll;
 		}
 		
 		.game {
-			margin-bottom: 2%;
+			margin-bottom: 2vh;
 		}
 		
 		.gameSelect {
-			width: 90%;
-			margin-left: 5%;
-			height: 10%;
+			width: 90vw;
+			margin-left: 5vw;
+			height: 10vh;
 			
 			background-image:
 				linear-gradient(to left, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1), rgba(255, 255, 255, 1));
 			border-radius: 25px;
+			background-size: 100vw;
 			
-			padding-top: 1%;
-			font-size: 300%;
+			padding-top: 1vh;
+			font-size: 3vh;
 			font-family:courier,arial,helvetica;
 			color: black;
 		}
 		
 		.arrowSelect {
-			width: 3%;
-			margin-left: 2%;
+			width: 3vw;
+			margin-left: 3vw;
 		}
 		
 		.gameDetails {
-			margin-left: 10%;
-			margin-top: 1%;
+			margin-left: 10vw;
+			margin-top: 1vh;
 			
 			font-size: 60%;
 		}
@@ -58,33 +61,23 @@
 		.gameDescription {
 			transition: height 1s ease;
 		
-			width: 80%;
-			margin-left: 10%;
+			width: 75vw;
+			margin-left: 10vw;
 			background-color: white;
 			margin-top: 0%;
 			border-radius: 0px 0px 25px 25px;
 			border: 5px solid grey;
 			
-			height: .5%;
+			height: .5vh;
 			/*max-height: .5%;*/
 			overflow-y: hidden;
 		}
-		
-		/*.gameDescription.selected {
-			webkit-transition: 4s;
-			-moz-transition: 4s;
-			-ms-transition: 4s;
-			-o-transition: 4s;
-			transition: 4s;
-			
-			max-height: 200%;
-		}*/
 		
 		
 		.descriptionText {
 			font-size: 1.3vh;	
 			font-family:Lucida Console,arial,helvetica;
-			margin-left: 2%;
+			margin-left: 2vw;
 		}
 	
 	</style>
@@ -157,23 +150,101 @@
 							
 							console.log(game.find(".gameSelect").css("background-image"));
 						});
+						
+						$(".gameSelect").click(function() {
+				
+							if (selectedGame != 0) {
+								var selector = $("#partyLeaderSeletion").children().eq(selectedGame - 1).children().eq(1);				
+								selector.css("height", ".5%");
+							}
+						
+							games = $("#partyLeaderSeletion").children();
+							theGame = $(this).parent();			
+							selectedGame = games.index(theGame) + 1;
+							
+							$(this).next().css("height", (Array.prototype.reduce.call($(this).next()[0].childNodes, function(p, c) {return p + (c.offsetHeight || 0);}, 40)) + 'px');
+						});
 					});
 				}
-			});
-			
-			$(".gameSelect").click(function() {
-				
-				if (selectedGame != 0) {
-					var selector = $("#partyLeaderSeletion").children().eq(selectedGame - 1).children().eq(1);				
-					selector.css("height", ".5%");
+				else {
+					//Reload the page after a certain time
+					setInterval(function() {
+						GetRequest(GetRoomPath() + "/currentGameID",function(res) {
+							gameID = JSON.parse(res.responseText);
+							if (gameID != 0)
+								location.reload();
+						});
+					}, 500);
 				}
-			
-				games = $("#partyLeaderSeletion").children();
-				theGame = $(this).parent();			
-				selectedGame = games.index(theGame) + 1;
-				
-				$(this).next().css("height", (Array.prototype.reduce.call($(this).next()[0].childNodes, function(p, c) {return p + (c.offsetHeight || 0);}, 40)) + 'px');
 			});
+					
+		}
+		
+		function fixedSizes()
+		{
+			var w = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+			var h = window.innerHeight || document.documentElement.clientHeight || document.body.clientheight;
+			var units = {vw: w / 100, vh: h / 100, vmin: (w > h ? h : w) / 100, vmax: (w > h ? w : h) / 100};
+			var sheet = addSheet();
+
+			for (var s = 0; s < document.styleSheets.length - 1; s++)
+			{
+				var rules = document.styleSheets[s].cssRules || document.styleSheets[s].rules;
+
+				for (var r = 0; r < rules.length; r++)
+				{
+					var rule = rules[r];
+
+					if (rule.type == CSSRule.STYLE_RULE)
+					{
+						var selector = rule.selectorText;
+						var styles = rule.style.cssText.match(/[\w-]+\s?:\s?-?[\d\.]+(vw|vh|vmin|vmax)/g);
+
+						for (var t = 0; styles && t < styles.length; t++)
+						{
+							var style = styles[t];
+							var prop = style.match(/^[\w-]*/)[0];
+							var unit = style.match(/(vw|vh|vmin|vmax)$/)[0];
+							var val = parseFloat(style.match(/-?[\d\.]+(vw|vh|vmin|vmax)/)[0]) * units[unit];
+							addStyle(sheet, selector, prop + ": " + val + "px");
+						}
+					}
+				}
+			}
+
+			function addSheet()
+			{
+				var s = document.createElement("style");
+				s.type = "text/css";
+				s.rel = "stylesheet";
+				s.media = "screen";
+				document.getElementsByTagName("head")[0].appendChild(s);
+				return(document.styleSheets[document.styleSheets.length - 1]);
+			}
+
+			function addStyle(sheet, selector, style)
+			{
+				if (sheet.addRule)
+				{
+					sheet.addRule(selector, style);
+				}
+				else if (sheet.insertRule)
+				{
+					sheet.insertRule(selector + " { " + style + " }");
+				}
+			}       
+		}
+
+		if (CSSRule)
+		{
+			if (document.addEventListener)
+			{
+				document.addEventListener("DOMContentLoaded", fixedSizes, false);
+			}
+			else if (window.attachEvent)
+			{
+				window.attachEvent("onload", fixedSizes);
+			}
 		}
 		
 	</script>
