@@ -93,41 +93,19 @@
 <body>
 	<h1 id="mainTitle"><u>LOBBY<i>(waiting)</i></u></h1>
 	
-	<div id="partyLeaderSeletion">
+	<div id="partyLeaderSeletion"></div>
+	
+	<div style="display:hidden" id="gameListCloning">
 		<div class="game">
 			<div class="gameSelect">
 				<img class="arrowSelect" src="arrow.png">
 				<span class="gameTitle">1: Prototype Card Game</span>
 				<div class="gameDetails">
 					<img class="arrowSelect" src="nbPlayers.png">
-					<span>1-2 Players</span><br/>
+					<span class="nbPlayers">1-2 Players</span><br/>
 					
 					<img class="arrowSelect" src="time.png">
-					<span>10-15 min</span><br/>
-				</div>
-			</div>
-			<div class="gameDescription">
-				<p class="descriptionText">
-					Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut 
-					labore et dolore magna aliqua. Ut enim ad minim veniam, 
-					quis nostrud exercitation ullamco laboris nisi ut aliquip 
-					ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate 
-					velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat 
-					non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-				</p>
-			</div>
-		</div>
-		
-		<div class="game">
-			<div class="gameSelect">
-				<img class="arrowSelect" src="arrow.png">
-				<span class="gameTitle">1: Prototype Card Game</span>
-				<div class="gameDetails">
-					<img class="arrowSelect" src="nbPlayers.png">
-					<span>1-2 Players</span><br/>
-					
-					<img class="arrowSelect" src="time.png">
-					<span>10-15 min</span><br/>
+					<span class="timeDuration">10-15 min</span><br/>
 				</div>
 			</div>
 			<div class="gameDescription">
@@ -164,7 +142,19 @@
 								
 					//Get and display all the available games
 					GetRequest(CDN_URL + "/Scripts/gamesInfo.json", function(res) {
-						var games = JSON.parse(res.responseText)
+						var games = JSON.parse(res.responseText);
+						
+						games.foreach(function(el) {
+							var game = $("#gameListCloning").children().eq(0).clone();
+							
+							game.appendTo($("#partyLeaderSeletion"));
+							
+							game.children(".gameTitle").html(el["name"]);
+							game.children(".background-image", 
+								"linear-gradient(to left, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1), rgba(255, 255, 255, 1)), url('" + CDN_URL + "Images/GameSelection/" + el["backgroundImage"] + "');")
+							game.children(".nbPlayers").html(el["nbPlayers"]);
+							game.children(".timeDuration").html(el["timeDuration"])
+						});
 					});
 				}
 			});
