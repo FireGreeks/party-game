@@ -13,12 +13,36 @@
 			font-family:courier,arial,helvetica;
 			color: white;
 		}
+		
+		
+		#partyLeaderSeletion {
+			display: none;
+		}
 	
 	</style>
 </head>
 <body>
 	<h1 id="mainTitle"><u>LOBBY<i>(waiting)</i></u></h1>
 	
+	<div id="partyLeaderSeletion">Test</div>
+	
 	<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+	<script>
+		
+		const player;
+		
+		//When window loads get all the information on current player
+		window.onload = function() {
+			GetRequest(GetRoomPath() + "/Players/" + localStorage.playerID, function(res) {
+				player = JSON.parse(res.responseText);
+
+				//Display game selection screen
+				if (player["isPartyLeader"]) {
+					$("#partyLeaderSeletion").css("display", "block")
+				}
+			}
+		}
+		
+	</script>
 </body>
 </html>

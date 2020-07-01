@@ -82,21 +82,23 @@
 			roomID = document.getElementById("roomID").value;
 			
 			//Check if roomID is valid
-			GetRequest(serverURL + "/GetRooms", function() {
-				if (this.readyState == 4 && this.status == 200) {
-					const roomIDsAvailable = JSON.parse(this.responseText);
-					console.log(roomIDsAvailable);
+			GetRequest(serverURL + "/GetRooms", function(res) {
+				const roomIDsAvailable = JSON.parse(res.responseText);
+				console.log(roomIDsAvailable);
 					
-					if (roomIDsAvailable.includes(roomID)) {
-						PostRequest(serverURL + "/" + roomID + "/JoinRoom", JSON.stringify({"name": name}), function() {
-							console.log("Joined Game");
+				if (roomIDsAvailable.includes(roomID)) {
+					PostRequest(serverURL + "/" + roomID + "/JoinRoom", JSON.stringify({"name": name}), function(res) {
+						console.log("Joined Game");
 
-							window.location.href += "/" + roomID
-						});
-					}
-					else {
-						alert("Room not found");
-					}
+						//Get player ID, and save it in the local storage of the browser
+						const player = JSON.parse(res.responseText);
+						localStorage.playerID = player["id"]
+						
+						window.location.href += "/" + roomID
+					});
+				}
+				else {
+					alert("Room not found");
 				}
 
 			});
