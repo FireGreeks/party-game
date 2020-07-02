@@ -1,0 +1,127 @@
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+	<style>
+	
+		body {
+			background-color: #b03070;
+		}
+	
+		#mainTitle {
+			text-align: center;
+			margin-top: 10vh;
+			font-size: 7vw;
+			font-family:courier,arial,helvetica;
+			color: white;
+		}
+	
+	</style>
+</head>
+<body>
+	<h1 id="mainTitle"><u>MOTOR SKILL TEST</u></h1>
+	
+	<p id="angle"></p>
+	
+	<input type="range" min="-75" max="75" value="0" id="rotationSlider" oninput="sliderChange(this)">
+	<canvas id="can"></canvas>
+	
+	<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+	<script src="https://raw.githack.com/FireGreeks/party-game/master/Party%20Game/Assets/Mobile%20Client/Scripts/ServerCode.js"></script>
+	<script>
+		
+		var c;
+		var ctx;
+
+		var floorWidth = 0.8; //Percent
+		var startPosY;
+		
+		var ball = [0, 0, 10];
+		var ballSpeed = [0, 0];
+		
+		var floorRotation = 0;
+		
+		window.onload = function() {
+			c = document.getElementById("can");
+			ctx = c.getContext("2d");
+			
+			c.width = window.innerWidth * 0.95;
+			c.height = window.innerHeight / 2;
+			
+			startPosY = c.height / 2;
+			ball[0] = c.width / 2;
+			ball[1] = startPosY;
+			
+			window.addEventListener('deviceorientation', function(event) {
+				var absolute = event.absolute;
+				var alpha = event.alpha;
+				var beta = event.beta;
+				var gamma = event.gamma;
+				
+				if (alpha > 180)
+					alpha = -360 + alpha
+					
+				floorRotation = alpha;
+				
+				$("#angle").html("Got angle:" + alpha);
+				console.log(alpha);
+			});
+			
+		}
+		
+		var xAcc;
+		function update() {
+			
+			var angle = floorRotation * Math.PI / 180;
+			var angleMultiplier = floorRotation / 1000;
+			
+			
+			if (Math.abs((ball[0] - (c.width / 2)) / Math.cos(-angle)) <= c.width * floorWidth / 2) 
+			{
+				xAcc = Math.sqrt(1 / (Math.tan(angle)**2 + 1)) * angleMultiplier;
+				
+				ballSpeed[0] += xAcc;
+				
+				var yAcc = ballSpeed[0] * Math.cos(angle) * angleMultiplier;
+				yAcc = (yAcc < 0) ? yAcc : 0;
+				
+				ballSpeed[1] += yAcc;
+								
+				ball[0] += ballSpeed[0];
+				ball[1] = startPosY - ((ball[0] - (c.width / 2)) * Math.tan(-angle));
+			}
+			else
+			{
+				ballSpeed[0] += xAcc;
+				ballSpeed[1] += 1;
+				
+				ball[0] += ballSpeed[0];
+				ball[1] += ballSpeed[1];
+			}
+			
+			ctx.clearRect(0, 0, c.width, c.height);
+			
+			//Draw circle
+			ctx.beginPath();
+			ctx.arc(ball[0], ball[1], ball[2], 0, Math.PI * 2);
+			ctx.fill()
+			ctx.closePath();
+			
+			//Draw floorRotation
+			ctx.translate(c.width / 2, startPosY + ball[2] + 5)
+			ctx.rotate(angle);
+			ctx.fillRect(-c.width * floorWidth / 2, 0, c.width * floorWidth, 10);			
+			ctx.setTransform(1, 0, 0, 1, 0, 0);
+			
+			window.requestAnimationFrame(update);
+		}
+		
+		function sliderChange(el) {
+			floorRotation = parseInt(el.value);
+		}
+	
+		
+		window.requestAnimationFrame(update)
+		
+	</script>
+</body>
+</html>

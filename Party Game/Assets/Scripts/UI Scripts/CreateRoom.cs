@@ -10,6 +10,14 @@ using UnityEngine.SceneManagement;
 
 public class CreateRoom : MonoBehaviour
 {
+
+    [SerializeField] private int frameCycle = 20;
+    [SerializeField] private int sceneIndexDelay = 0;
+
+    [SerializeField] private TextMeshProUGUI playerList;
+
+
+
     private string codePossibilities = "ABCDEFGHIJKLMNOPQRSTUWXYZ0123456789";
     private string currentCode = "";
 
@@ -83,10 +91,6 @@ public class CreateRoom : MonoBehaviour
         }
     }
 
-
-    [SerializeField] private int frameCycle = 20;
-    [SerializeField] private TextMeshProUGUI playerList;
-
     private int frame = 0;
     private void Update()
     {
@@ -113,6 +117,7 @@ public class CreateRoom : MonoBehaviour
                 Debug.Log("Error: " + webRequest.error);
             else
             {
+                //Display connected players
                 JSONNode result = JSON.Parse(webRequest.downloadHandler.text);
                 JSONNode players = result["Players"];
 
@@ -123,36 +128,14 @@ public class CreateRoom : MonoBehaviour
                     playerList.text += "- " + player["name"].ToString() + (player["isPartyLeader"] ? "    VIP" : "") + "\n" ;
 
                 }
+
+
+                //Check if a game has been selected
+                int currentGameID = result["currentGameID"].AsInt;
+                if (currentGameID != 0)
+                    SceneManager.LoadScene(currentGameID + sceneIndexDelay); //If game isn't lobby, load game
                     
             }
         }
-    }
-
-
-    //The following code is only used as a protoype
-    public void SelectGame()
-    {
-        StartCoroutine(StartGame());
-    }
-
-    private IEnumerator StartGame()
-    {
-        var webRequest = new UnityWebRequest(ServerInfo.RoomURL + "/SelectGame");
-        webRequest.method = "POST";
-        webRequest.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes("{\"gameID\":1}"));
-        webRequest.downloadHandler = new DownloadHandlerBuffer();
-        webRequest.SetRequestHeader("Content-Type", "application/json");
-
-        // Request and wait for the desired page.
-        yield return webRequest.SendWebRequest();
-
-        if (webRequest.isNetworkError)
-            Debug.Log("Error: " + webRequest.error);
-        else
-        {
-            Debug.Log("Game Started");
-            SceneManager.LoadScene(1);
-        }
-        
     }
 }
