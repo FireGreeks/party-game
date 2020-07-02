@@ -19,9 +19,7 @@
 </head>
 <body>
 	<h1 id="mainTitle"><u>MOTOR SKILL TEST</u></h1>
-	
-	<p id="angle"></p>
-	
+		
 	<input type="range" min="-75" max="75" value="0" id="rotationSlider" oninput="sliderChange(this)">
 	<canvas id="can"></canvas>
 	
@@ -60,9 +58,8 @@
 				if (alpha > 180)
 					alpha = -360 + alpha
 					
-				floorRotation = alpha;
+				floorRotation = -alpha;
 				
-				$("#angle").html("Got angle:" + alpha);
 				console.log(alpha);
 			});
 			
