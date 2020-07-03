@@ -115,13 +115,13 @@
 	<div style="display:none" id="gameListCloning">
 		<div class="game">
 			<div class="gameSelect">
-				<img class="arrowSelect" src="arrow.png">
+				<img class="arrowSelect" src="https://raw.githack.com/FireGreeks/party-game/master/Party%20Game/Assets/Mobile%20Client/Images/GameSelection/Icons/Arrow.png">
 				<span class="gameTitle">Title</span>
 				<div class="gameDetails">
-					<img class="arrowSelect" src="nbPlayers.png">
+					<img class="arrowSelect" src="https://raw.githack.com/FireGreeks/party-game/master/Party%20Game/Assets/Mobile%20Client/Images/GameSelection/Icons/nbPlayers.png">
 					<span class="nbPlayers">x-x Players</span><br/>
 					
-					<img class="arrowSelect" src="time.png">
+					<img class="arrowSelect" src="https://raw.githack.com/FireGreeks/party-game/master/Party%20Game/Assets/Mobile%20Client/Images/GameSelection/Icons/time.png">
 					<span class="timeDuration">x-x mins</span><br/>
 				</div>
 			</div>
@@ -151,6 +151,7 @@
 		
 		
 		window.onload = function() {
+
 			//When window loads get all the information on current player
 			GetRequest(GetRoomPath() + "/Players/" + localStorage.playerID, function(res) {
 				player = JSON.parse(res.responseText);
