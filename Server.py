@@ -10,10 +10,10 @@ import MiniGamesDirector
 
 SERVER = {
     #Server information (Host and Port)
-    #"HOST": '127.0.0.1',
-    "HOST": "0.0.0.0",
-    "PORT": os.environ.get("PORT", 80),
-    #"PORT": 8000,
+    "HOST": '127.0.0.1',
+    #"HOST": "0.0.0.0",
+    #"PORT": os.environ.get("PORT", 80),
+    "PORT": 8000,
 
     "Rooms": {}
 }
@@ -54,9 +54,17 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             if roomID in SERVER["Rooms"].keys():
 
                 #Return the current game played in this room
-                currentGameID = SERVER["Rooms"][roomID]["currentGameID"]
+                currentGameID = str(SERVER["Rooms"][roomID]["currentGameID"])
 
-                html = open("Party Game/Assets/Mobile Client/Mini-Games/" + str(currentGameID) + ".html")
+                #Check for sub pgaes supports in current game
+                if currentGameID in MiniGamesDirector.MiniGamesPageSettings.keys():
+                    pageSettings = MiniGamesDirector.MiniGamesPageSettings[currentGameID]
+                    if pageSettings["supportsSubPages"]:
+                        varName = pageSettings["subPagesVariable"]
+                        currentGameID += "." + str(SERVER["Rooms"][roomID]["gameData"][varName])
+
+
+                html = open("Party Game/Assets/Mobile Client/Mini-Games/" + currentGameID + ".html")
                 response.write(html.read().encode())
 
             else:
@@ -187,7 +195,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
                     gameID = parsed_json["gameID"]
                     Room["currentGameID"] = gameID
 
-                    Room["gameData"] = MiniGamesDirector.SetupGames(gameID, Room["gameData"].copy())
+                    Room["gameData"] = MiniGamesDirector.SetupGames(gameID, Room["gameData"].copy(), Room)
 
 
                 ##-------ALTER GAME DATA (Post by Unity and HTML Client)---------
@@ -208,14 +216,26 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
                             print("400: Bad request, variable", variable," is non-existent")
                             break
 
+                        """
+                        {
+                            "Players" : ["GET", "567", ["SET", 567]]
+                        }
+                        """
+
+                        variableString = "['" + str(variable) + "']"
                         #Check which action it is supposed to take
+                        if action == "GET":
+                            variableString += "['" + str(value) + "']"
+                            action = item[2][0]
+                            value = item[2][1]
+
                         if action == "SET":
-                            gameData[variable] = value
+                            exec("gameData" + variableString + " = value")
 
                         elif action == "ADD":
-                            if type(gameData[variable]) in [int, float, str]:
+                            if type(eval("gameData" + variableString)) in [int, float, str]:
                                 try:
-                                    gameData[variable] += value
+                                    exec("gameData" + variableString + " += value")
                                 except:
                                     repnumber = 400
                                     print("400: Bad request, uncompatibilty between variable's' and given value's types'")
@@ -225,32 +245,32 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
 
                         elif action == "SUB":
-                            if type(gameData[variable]) in [int, float]:
-                                gameData[variable] -= value
+                            if type(eval("gameData" + variableString)) in [int, float]:
+                                exec("gameData" + variableString + " -= value")
                             else:
                                 repnumber = 400
                                 print("400: Bad request, type of variable isn't compatible with demanded action'")
 
 
                         elif action == "ADD_ARRAY":
-                            if type(gameData[variable]) == list:
-                                gameData[variable].append(value)
+                            if type(eval("gameData" + variableString)) == list:
+                                exec("gameData" + variableString + ".append(value)")
                             else:
                                 repnumber = 400
                                 print("400: Bad request, type of variable isn't compatible with demanded action'")
 
 
                         elif action == "SET_DICT":
-                            if type(gameData[variable]) == dict:
-                                gameData[variable][value[0]] = value[1]
+                            if type(eval("gameData" + variableString)) == dict:
+                                exec("gameData" + variableString + "[value[0]] = value[1]")
                             else:
                                 repnumber = 400
                                 print("400: Bad request, type of variable isn't compatible with demanded action'")
 
 
                         elif action == "DEL":
-                            if type(gameData[variable]) in [list, dict]:
-                                gameData[variable].pop(value)
+                            if type(eval("gameData" + variableString)) in [list, dict]:
+                                exec("gameData" + variableString + ".pop(value)")
                             else:
                                 repnumber = 400
                                 print("400: Bad request, type of variable isn't compatible with demanded action'")

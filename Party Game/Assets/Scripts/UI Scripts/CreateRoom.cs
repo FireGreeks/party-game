@@ -11,11 +11,13 @@ using UnityEngine.SceneManagement;
 public class CreateRoom : MonoBehaviour
 {
 
+    [Header("Networking Settings")]
     [SerializeField] private int frameCycle = 20;
     [SerializeField] private int sceneIndexDelay = 0;
 
+    [Header("Components")]
     [SerializeField] private TextMeshProUGUI playerList;
-
+    [SerializeField] private TextMeshProUGUI roomCode;
 
 
     private string codePossibilities = "ABCDEFGHIJKLMNOPQRSTUWXYZ0123456789";
@@ -69,6 +71,8 @@ public class CreateRoom : MonoBehaviour
 
         Debug.Log("The code is : " + currentCode);
         Debug.Log("Creating Room");
+
+        roomCode.text = "Room Code: " + currentCode;
 
         string uri = ServerInfo.ServerURL + "/CreateRoom";
         string data = "{\"id\": \"" + currentCode + "\"}";
