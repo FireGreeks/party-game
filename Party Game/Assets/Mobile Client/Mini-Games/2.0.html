@@ -23,7 +23,7 @@
 		}
 		
 		.testVote {
-			margin-left: 11vw;
+			margin-left: 3.5vw;
 			width: auto;
 			display: inline-block;
 			text-align: center;
@@ -37,19 +37,37 @@
 		.testVoteImgs {
 			width: 30vw;
 			height: 30vw;
-			vertical-align: top;
-			
+			vertical-align: top;	
+			filter: grayscale(100%);
+		}
+		.testVoteImgs.selected {
+			border: 2px solid red;
+			filter: none;			
+		}
+		
+		.tick {
+			width: 5vw;
+			height: 5vw;
+			position: relative;
+			left: calc(32.666vw + 3px);
+			top: 3px;
+			visibility: hidden;
 		}
 		
 		.testVote>p {
 			margin-top: 1vh;
 			width : 30vw;
+			margin-left: 8vw;
 		}
 		
 		.confirmVote {
 			font-size: 5vw;
 			font-family:courier,arial,helvetica;
 			width: 40vw;
+		}
+		.confirmVote.impossible {
+			opacity: 50%;
+			pointer-events: none;
 		}
 		
 		#TestVoteHTML {
@@ -63,10 +81,10 @@
 		
 		#InfectingHTML {
 			text-align: center;
-			display: none;
+			display: block;
 		}
 		
-		#players {
+		.players {
 			margin-top: 5vh;
 			margin-bottom: 3vh;
 		}
@@ -85,6 +103,50 @@
 			background-color: #4f345c;
 			width: 50vw;
 		}
+		.playerVoteDiv.selected {
+			border: 2px solid red;
+			background-color: #cca6de;
+			color: black;
+		}
+		
+		.disenfectYourself {
+			color: black;
+			font-size: 5vw;
+			font-family:courier,arial,helvetica;
+			font-size: 5vw;
+			border: 2px solid black;
+			border-radius: 7px;
+			margin: auto;
+			margin-bottom: 2vh;
+			text-align: left;
+			padding-left: 1vw;
+			background-color: #345c11;
+			width: 50vw;
+		}
+		.disenfectYourself.selected {
+			border: 2px solid red;
+			background-color: #a1b300;
+			color: white;
+		}
+		
+		.blankVote {
+			color: black;
+			font-size: 5vw;
+			font-family:courier,arial,helvetica;
+			font-size: 5vw;
+			border: 2px solid black;
+			border-radius: 7px;
+			margin: auto;
+			margin-bottom: 3vh;
+			text-align: center;
+			padding-left: 1vw;
+			background-color: white;
+			width: 40vw;
+		}
+		.blankVote.selected {
+			border: 2px solid red;
+			background-color: #d4d4d4;
+		}
 		
 	</style>
 </head>
@@ -94,36 +156,31 @@
 	<div id="TestVoteHTML" class="steps">
 		<h2 class="instructions">Please vote for the next test you would like to do:</h2>
 		<div class="testVote">
-			<img class="testVoteImgs"></img><br/>
+			<img class="tick"></img>
+			<img class="testVoteImgs" onclick="votedTest(0)"></img><br/>
 			<p>Vote N°1</p>
 		</div>
 		<div class="testVote">
-			<img class="testVoteImgs"></img><br/>
+			<img class="tick"></img>
+			<img class="testVoteImgs" onclick="votedTest(1)"></img><br/>
 			<p>Vote N°1</p>
 		</div><br/>
 		<div style="text-align: center">
-			<button class="confirmVote" onclick="confirmVote()">CONFIRM</button>
+			<button class="confirmVote impossible" onclick="confirmVote()">CONFIRM</button>
 		</div>
 	</div>
 	
 	<div id="TrialHTML" class="steps">
 		<h2 class="instructions">Please vote for the people you think are infected<br/><i><span style="font-size: 3vw">(Infected votes are ignored in the final count)</span></i></h2>
-		<div id="players">
-			<div class="playerVoteDiv">Samuel</div>
-			<div class="playerVoteDiv">Theodor</div>
-			<div class="playerVoteDiv">Aaron</div>
-		</div>
-		<button class="confirmVote" onclick="confirmVote()">CONFIRM</button>
+		<div class="players"></div>
+		<div class="blankVote" onclick="voteBlank(this)">VOTE BLANK</div>
+		<button class="confirmVote impossible" onclick="confirmVote()">CONFIRM</button>
 	</div>
 	
 	<div id="InfectingHTML" class="steps">
-		<h2 class="instructions">Choose who you wish to infect for the next day</span></i></h2>
-		<div id="players">
-			<div class="playerVoteDiv">Samuel</div>
-			<div class="playerVoteDiv">Theodor</div>
-			<div class="playerVoteDiv">Aaron</div>
-		</div>
-		<button class="confirmVote" onclick="confirmVote()">CONFIRM</button>
+		<h2 class="instructions"></h2>
+		<div class="players"></div>
+		<button class="confirmVote impossible" onclick="confirmVote()">CONFIRM</button>
 	</div>
 	
 	<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
@@ -131,31 +188,208 @@
 	<script>
 		
 		var requestInterval = 200;
+		var needNewRequest = true;
 		
 		var gameData;
+		var playerData;
+		
+		var selectedTest = 0;
+		var playersTrialSelected = [];
+		var blankVote = false;
+		var playersInfectSuspSelected = 0;
 		
 		window.onload = function() {
 			setInterval(function() {
-				//Get gameData each X milliseconds
-				GetRequest(GetRoomPath() + "/gameData", function(res) {
-					var data = JSON.parse(res.responseText);
-					
-					//If step has changed
-					if (data["currentCycleStep"] != gameData["currentCycleStep"] || data["stepSpecification"] != gameData["stepSpecification"]) {
+				
+				if (needNewRequest) {
+			
+					//Get gameData each X milliseconds
+					GetRequest(GetRoomPath() + "/gameData", function(res) {
+						var data = JSON.parse(res.responseText);
+						playerData = data["Players"][localStorage.playerID];
+						
+						//If step has changed
+						if (!gameData || data["currentCycleStep"] != gameData["currentCycleStep"] || data["stepSpecification"] != gameData["stepSpecification"]) {
+							gameData = data;
+							changeDisplay(gameData["currentCycleStep"], gameData["stepSpecification"]);
+						}
+						
 						gameData = data;
-						changeDisplay(gameData["currentCycleStep"], gameData["stepSpecification"]);
-					}
+					});
 					
-					gameData = data;
-				});
+				}
 			}, requestInterval);
 			
 		}
 		
-		function changeDisplay(step, spec) {
-			//Display HTML elements based on step in day/night cycle
+		//Display HTML elements based on step in day/night cycle
+		function changeDisplay(step, spec) {			
 			$(".steps").css("display", "none");
-			$("#" + step + "HTML").css("display", "block")
+			$("#" + step + "HTML").css("display", "block");
+
+			selectedTest = -1;
+			$("#TestVoteHTML").find(".confirmVote").addClass("impossible");
+			$("#TestVoteHTML").find(".testVoteImgs").removeClass("selected");
+			$("#TestVoteHTML").find(".tick").css("visibility", "hidden");
+			
+			playersTrialSelected = [];
+			blankVote = false;
+			$("#TrialHTML").find(".players").html("")
+			for (const [playerID, player] of Object.entries(gameData["Players"])) {			
+				if (playerID != localStorage.playerID) {
+					var playerDIV = document.createElement("div");
+					$(playerDIV).addClass("playerVoteDiv");
+					$(playerDIV).html(player["name"]);
+					$(playerDIV).attr("id", playerID)
+					
+					playerDIV.addEventListener("click", selectForTrial);
+					
+					$("#TrialHTML").find(".players").append(playerDIV);
+				}
+			}
+			$("#TrialHTML").find(".confirmVote").addClass("impossible");
+			$("#TrialHTML").find(".blankVote").removeClass("selected");
+				
+				
+			playersInfectSuspSelected = -1;
+			if (playerData["role"] == "INFECTED")
+				$("#InfectingHTML").find(".instructions").html("Choose who to infect for the next day, if you wish to do so...")
+			else
+				$("#InfectingHTML").find(".instructions").html("Please point out who you suspect of being infected. If correct, their symptoms will get much worse")
+			
+			$("#InfectingHTML").find(".players").html("")
+			for (const [playerID, player] of Object.entries(gameData["Players"])) {
+				if (playerID != localStorage.playerID && (playerData["role"] == "SANE" || player["role"] != "INFECTED")) {
+					var playerDIV = document.createElement("div");
+					$(playerDIV).addClass("playerVoteDiv");
+					$(playerDIV).html(player["name"]);
+					$(playerDIV).attr("id", playerID);
+					
+					playerDIV.addEventListener("click", infectSuspect);
+					
+					$("#InfectingHTML").find(".players").append(playerDIV);
+				}
+				if (playerData["role"] == "INFECTED") {
+					var playerDIV = document.createElement("div");
+					$(playerDIV).addClass("disenfectYourself");
+					$(playerDIV).html("Disenfect yourself...");
+					$(playerDIV).attr("id", localStorage.playerID);
+					
+					playerDIV.addEventListener("click", infectSuspect);
+					
+					$("#InfectingHTML").find(".players").append(playerDIV);
+				}
+			}
+			if (playerData["role"] == "INFECTED")
+				$("#InfectingHTML").find(".confirmVote").removeClass("impossible");
+				
+		}
+		
+		//Voted for test, by cliking on IMG
+		function votedTest(index) {
+			selectedTest = index;
+			
+			var images = $("#TestVoteHTML").find(".testVoteImgs");
+			images.removeClass("selected");
+			images.prev().css("visibility", "hidden")
+			
+			if (selectedTest != -1) {
+				images.eq(selectedTest).addClass("selected");
+				images.eq(selectedTest).prev().css("visibility", "visible");
+				
+				$("#TestVoteHTML").find(".confirmVote").removeClass("impossible");
+			}
+		}
+		
+		//Voted for trial, by clicking on player DIVs
+		function selectForTrial() {
+			$("#TrialHTML").find(".blankVote").removeClass("selected");
+			blankVote = false;
+		
+			var allPlayerDivs = $("#TrialHTML").find(".players").children();
+			var index = allPlayerDivs.index(this);
+			
+			if (playersTrialSelected.length < 2 || playersTrialSelected.includes(index)) {
+				if ($(this).hasClass("selected"))
+					playersTrialSelected.splice(playersTrialSelected.indexOf(index), 1);
+				else
+					playersTrialSelected.push(index);
+			
+				$(this).toggleClass("selected");
+			}
+			else {
+				playersTrialSelected = [index];
+				allPlayerDivs.removeClass("selected")
+				$(this).addClass("selected")
+			}
+			
+			if (playersTrialSelected.length == 2)
+				$("#TrialHTML").find(".confirmVote").removeClass("impossible");
+			else
+				$("#TrialHTML").find(".confirmVote").addClass("impossible");
+		}
+		function voteBlank(el) {
+			blankVote = !blankVote;
+			$(el).toggleClass("selected");
+			$("#TrialHTML").find(".players").children().removeClass("selected");
+			playersTrialSelected = []
+			
+			if (blankVote)
+				$("#TrialHTML").find(".confirmVote").removeClass("impossible");
+			else
+				$("#TrialHTML").find(".confirmVote").addClass("impossible");
+				
+		}
+		
+		
+		//Choose you you infect (INFCETED) or suspect (SANE)
+		function infectSuspect() {
+			var allPlayerDivs = $("#InfectingHTML").find(".players").children();
+			index = allPlayerDivs.index(this);
+			
+			$("#InfectingHTML").find(".players").children().removeClass("selected");
+			
+			if (playerData["role"] == "INFECTED")
+				playersInfectSuspSelected = (index == playersInfectSuspSelected) ? -1 : index;
+			else
+				playersInfectSuspSelected = index;
+				
+			if (playersInfectSuspSelected != -1)
+				$("#InfectingHTML").find(".players").children().eq(playersInfectSuspSelected).addClass("selected");
+			
+			if (playersInfectSuspSelected != -1 || playerData["role"] == "INFECTED")
+				$("#InfectingHTML").find(".confirmVote").removeClass("impossible");
+			else
+				$("#InfectingHTML").find(".confirmVote").addClass("impossible");
+		}
+		
+		
+		//Confirm Vote
+		function confirmVote() {
+			var varToSend;
+			if (gameData["currentCycleStep"] == "TestVote") 
+				varToSend = selectedTest;	
+				
+			else if (gameData["currentCycleStep"] == "Trial") {
+				if (playersTrialSelected == -1)
+					varToSend = [-1]
+				else {
+					varToSend = []
+					playersTrialSelected.forEach(function(el) {
+						varToSend.append($("#TrialHTML").find(".players").children().eq(el).attr("id"))
+					}
+				}
+			}
+			
+			else if (gameData["currentCycleStep"] == "Infecting") 
+				varToSend = (playersInfectSuspSelected == -1) ? -1 :$("#TrialHTML").find(".players").children().eq(playersInfectSuspSelected).attr("id");
+			
+			//Post Vote
+			var data = JSON.stringify({"voting": ["SET_DICT", [localStorage.playerID, varToSend]]});
+			PostRequest(GetRoomPath() + "/AlterGameData", data, function(res) {
+				//DO SOMETHING
+			});
+			
 		}
 		
 	</script>

@@ -216,11 +216,6 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
                             print("400: Bad request, variable", variable," is non-existent")
                             break
 
-                        """
-                        {
-                            "Players" : ["GET", "567", ["SET", 567]]
-                        }
-                        """
 
                         variableString = "['" + str(variable) + "']"
                         #Check which action it is supposed to take
@@ -279,6 +274,22 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
                     if repnumber == 200:
                         Room["gameData"] = gameData.copy()
                         response.write(json.dumps(Room["gameData"]).encode())
+
+                        gameID = Room["currentGameID"]
+                        if str(gameID) in MiniGamesDirector.MiniGamesPageSettings.keys():
+                            if MiniGamesDirector.MiniGamesPageSettings[str(gameID)]["callOnDataChange"]:
+                                MiniGamesDirector.OnGameDataChange(gameID, Room["gameData"], Room)
+
+                ##-------CALL GAME FUNCTION (Post by Unity and HTML Client)---------
+                #This POST Request takes as argument the name of the function in the current game to call
+                #This makes repetitive mechanics a lot easier to handle
+
+                elif path == "/CallGameFunction":
+                    functionName = parsed_json["functionName"]
+                    arguments = parsed_json["arguments"]
+
+                    MiniGamesDirector.CustomFunction(Room["currentGameID"], functionName, arguments, Room)
+
 
 
         self.send_response(repnumber) #Add Response header --> 200:OK
