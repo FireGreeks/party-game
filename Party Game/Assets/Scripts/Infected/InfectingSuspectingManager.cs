@@ -30,8 +30,13 @@ public class InfectingSuspectingManager : MonoBehaviour
         eyeAnimator.SetTrigger("Open");
     }
 
+    private void CloseAnimationFinished()
+    {
+        StartCoroutine(ServerInfo.NextStep("Infecting", "Intro"));
+    }
+
     private void OpenAnimationFinished()
     {
-        ServerInfo.NextStep("Infecting", "Conclusion");
+        StartCoroutine(ServerInfo.NextStep("Infecting", "Conclusion"));
     }
 }

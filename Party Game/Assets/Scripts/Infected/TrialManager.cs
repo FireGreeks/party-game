@@ -77,10 +77,13 @@ public class TrialManager : MonoBehaviour
 
     private void OnConclusion()
     {
-        JSONNode voteResults = gameLoopManager.gameData["results"];
+        if (gameObject.activeInHierarchy)
+        {
+            JSONNode voteResults = gameLoopManager.gameData["results"];
 
-        //DISPLAY RESULTS
+            //DISPLAY RESULTS
 
-        StartCoroutine(ServerInfo.NextStep("Trial", "Conclusion"));
+            StartCoroutine(ServerInfo.NextStep("Trial", "Conclusion"));
+        }
     }
 }

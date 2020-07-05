@@ -25,7 +25,7 @@ def SetupGames(gameID, data, room):
     elif gameID == 2:
         #Cycle Management
         data["currentCycleStep"] = "TestVote"   #TestVote --> Testing --> Trial --> Infecting
-        data["stepSpecification"] = "Intro"  #Intro --> InProgress --> Conclusion
+        data["stepSpecification"] = "Intro"     #Intro --> InProgress --> Conclusion
 
         #Player management
         data["nbOfPlayers"] = room["nbPlayers"]
@@ -83,7 +83,7 @@ def OnGameDataChange(gameID, data, room):
          if data["currentCycleStep"] in ["TestVote", "Trial", "Infecting"] and data["stepSpecification"] == "InProgress":
 
             #All players have voted
-            if len(data["votes"].keys()) == len(data["Players"].keys()):
+            if len(data["votes"].keys()) == data["nbOfPlayers"]:
 
                 #Reset the results dictionnary
                 data["results"] = {}
@@ -146,6 +146,8 @@ def OnGameDataChange(gameID, data, room):
                             player["infected"] = False
                         else:
                             player["infected"] = True
+
+                data["votes"] = {}
 
 
 

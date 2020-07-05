@@ -55,12 +55,15 @@ public class TestVoteManager : MonoBehaviour
 
     void OnConclusion()
     {
-        JSONNode voteResults = gameLoopManager.gameData["results"];
+        if (gameObject.activeInHierarchy)
+        {
+            JSONNode voteResults = gameLoopManager.gameData["results"];
 
-        //DISPLAY RESULTS
+            //DISPLAY RESULTS
 
-        //Next Step for protype purposes
-        StartCoroutine(ServerInfo.NextStep("TestVote", "InProgress"));
+            //Next Step for protype purposes
+            StartCoroutine(ServerInfo.NextStep("TestVote", "Conclusion"));
+        }
     }
 
 }

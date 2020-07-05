@@ -121,7 +121,7 @@
 			text-align: left;
 			padding-left: 1vw;
 			background-color: #345c11;
-			width: 50vw;
+			width: 70vw;
 		}
 		.disenfectYourself.selected {
 			border: 2px solid red;
@@ -269,19 +269,19 @@
 					
 					$("#InfectingHTML").find(".players").append(playerDIV);
 				}
-				if (playerData["role"] == "INFECTED") {
-					var playerDIV = document.createElement("div");
-					$(playerDIV).addClass("disenfectYourself");
-					$(playerDIV).html("Disenfect yourself...");
-					$(playerDIV).attr("id", localStorage.playerID);
-					
-					playerDIV.addEventListener("click", infectSuspect);
-					
-					$("#InfectingHTML").find(".players").append(playerDIV);
-				}
 			}
-			if (playerData["role"] == "INFECTED")
+			if (playerData["role"] == "INFECTED") {
 				$("#InfectingHTML").find(".confirmVote").removeClass("impossible");
+				
+				var playerDIV = document.createElement("div");
+				$(playerDIV).addClass("disenfectYourself");
+				$(playerDIV).html("Disenfect yourself...");
+				$(playerDIV).attr("id", localStorage.playerID);
+					
+				playerDIV.addEventListener("click", infectSuspect);
+					
+				$("#InfectingHTML").find(".players").append(playerDIV);
+			}
 				
 		}
 		
@@ -309,7 +309,7 @@
 			var allPlayerDivs = $("#TrialHTML").find(".players").children();
 			var index = allPlayerDivs.index(this);
 			
-			if (playersTrialSelected.length < 2 || playersTrialSelected.includes(index)) {
+			if (playersTrialSelected.length < gameData["nbOfInfected"] || playersTrialSelected.includes(index)) {
 				if ($(this).hasClass("selected"))
 					playersTrialSelected.splice(playersTrialSelected.indexOf(index), 1);
 				else
@@ -323,7 +323,7 @@
 				$(this).addClass("selected")
 			}
 			
-			if (playersTrialSelected.length == 2)
+			if (playersTrialSelected.length == gameData["nbOfInfected"])
 				$("#TrialHTML").find(".confirmVote").removeClass("impossible");
 			else
 				$("#TrialHTML").find(".confirmVote").addClass("impossible");
@@ -376,18 +376,18 @@
 				else {
 					varToSend = []
 					playersTrialSelected.forEach(function(el) {
-						varToSend.append($("#TrialHTML").find(".players").children().eq(el).attr("id"))
-					}
+						varToSend.push($("#TrialHTML").find(".players").children().eq(el).attr("id"))
+					});
 				}
 			}
 			
 			else if (gameData["currentCycleStep"] == "Infecting") 
-				varToSend = (playersInfectSuspSelected == -1) ? -1 :$("#TrialHTML").find(".players").children().eq(playersInfectSuspSelected).attr("id");
+				varToSend = (playersInfectSuspSelected == -1) ? -1 :$("#InfectingHTML").find(".players").children().eq(playersInfectSuspSelected).attr("id");
 			
 			//Post Vote
-			var data = JSON.stringify({"voting": ["SET_DICT", [localStorage.playerID, varToSend]]});
+			var data = JSON.stringify({"votes": ["SET_DICT", [localStorage.playerID, varToSend]]});
 			PostRequest(GetRoomPath() + "/AlterGameData", data, function(res) {
-				//DO SOMETHING
+				$("#" + gameData["currentCycleStep"] + "HTML").css("display", "none");
 			});
 			
 		}
