@@ -30,6 +30,8 @@ public class TrialManager : MonoBehaviour
     // Start is called before the first frame update
     void OnEnable()
     {
+        gameLoopManager.UpdateGameInfo(Update);
+
         //TO-DO
 
         //SOME ANIMATIONS

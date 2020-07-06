@@ -81,7 +81,7 @@
 		
 		#InfectingHTML {
 			text-align: center;
-			display: block;
+			display: none;
 		}
 		
 		.players {
@@ -148,10 +148,71 @@
 			background-color: #d4d4d4;
 		}
 		
+		#RoleDiscoveryHTML {
+			display: none;
+		}
+		
+		#isInfected {
+			display:none;
+		}
+		#isSane {
+			display:none;
+		}
+		.YouAreInfected {
+			color: white;
+			font: 8vw;
+			text-align:center;
+		}
+		.moreInfected {
+			display:none;
+		}
+		.YouAreSane {
+			color: white;
+			font: 8vw;
+			text-align:center;
+		}
+		.playersInfected {
+			margin-left: 1vw;
+			font-size: 5vw;
+			font-family:courier,arial,helvetica;
+			color:white;
+			margin-top: 1vh;
+		}
+		.note {
+			font-size: 3vw;
+			font-family:courier,arial,helvetica;
+			color:white;
+		}
+		
 	</style>
 </head>
 <body>
 	<h1 id="mainTitle"><u>INFECTED</u></h1>
+	
+	
+	<div id="RoleDiscoveryHTML" class="steps">
+		<h2 class="instructions" style="text-align:center">
+		<i>After a witch cursed our village with a deadly disease, infected people now roam the streets.</i><br/><br/>
+		It seems as though you are:
+		</h2>
+		<div id="isInfected">
+			<h1 class="YouAreInfected">INFECTED</h1>
+			<div class="moreInfected">
+				<h2 class="instructions" style="margin-bottom:0">ALONG WITH</h2>
+				<ul class="playersInfected">
+					<li>Samuel</li>
+					<li>Aaron</li>
+				</ul>
+				<h3 class="note"><u>Note:</u> <i>You can see who is infected after by clicking on the icon in the top banner</i></h3>
+			</div>
+		</div>
+		<div id="isSane">
+			<h1 class="YouAreSane">SANE</h1>
+		</div>
+		<div style="text-align: center">
+			<button class="confirmVote impossible" onclick="confirmVote()">CONFIRM</button>
+		</div>
+	</div>
 	
 	<div id="TestVoteHTML" class="steps">
 		<h2 class="instructions">Please vote for the next test you would like to do:</h2>
@@ -282,7 +343,29 @@
 					
 				$("#InfectingHTML").find(".players").append(playerDIV);
 			}
+			
+			//RoleDiscoveryHTML
+			if (player["role"] == "INFECTED") {
+				$("#RoleDiscoveryHTML").find(".isInfected").css("display", "block");
+				if (gameData["nbOfInfected"] > 1) {
+					var moreInfected = $("#RoleDiscoveryHTML").find(".moreInfected");
+					moreInfected.css("display", "block");
+					
+					gameData["infectedPlayers"].forEach(function(el) {
+						var playerLI = document.createElement("div");
+						$(playerLI).html(gameData["Players"][el]["name"]);
+						moreInfected.find(".playersInfected").append(playerLI);
+					})
+					
+				}
+			}
+			else
+				$("#RoleDiscoveryHTML").find(".isSane").css("display", "block")
 				
+			$("#RoleDiscoveryHTML").find(".confirmVote").addClass("impossible");
+			SetTimeout(function() {
+				$("#RoleDiscoveryHTML").find(".confirmVote").removeClass("impossible");
+			}, 3000);
 		}
 		
 		//Voted for test, by cliking on IMG

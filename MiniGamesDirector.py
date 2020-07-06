@@ -24,7 +24,7 @@ def SetupGames(gameID, data, room):
 
     elif gameID == 2:
         #Cycle Management
-        data["currentCycleStep"] = "TestVote"   #TestVote --> Testing --> Trial --> Infecting
+        data["currentCycleStep"] = "RoleDiscovery"   #RoleDicovery --> TestVote --> Testing --> Trial --> Infecting
         data["stepSpecification"] = "Intro"     #Intro --> InProgress --> Conclusion
 
         #Player management
@@ -33,12 +33,12 @@ def SetupGames(gameID, data, room):
         data["nbOfInfected"] = 1
         #data["nbOfInfected"] = {4:1, 5:2, 6:2, 7:3, 8:3}[room["nbPlayers"]],
 
-        infectedPlayers = []
+        data["infectedPlayers"] = []
         for i in range(data["nbOfInfected"]):
             index = -1
-            while index in infectedPlayers or index == -1:
+            while index in data["infectedPlayers"] or index == -1:
                 index = random.randrange(len(room["Players"]))
-            infectedPlayers.append(list(room["Players"])[index])
+            data["infectedPlayers"].append(list(room["Players"].keys())[index])
 
         availableCharacters = ["Peasant"]
         for ID, player in room["Players"].items():
@@ -47,8 +47,8 @@ def SetupGames(gameID, data, room):
                 "name": room["Players"][ID]["name"],
                 "score" : 0,
 
-                "role" : "INFECTED" if ID in infectedPlayers else "SANE", #SANE/INFECTED
-                "infected" : (ID in infectedPlayers),
+                "role" : "INFECTED" if ID in data["infectedPlayers"] else "SANE", #SANE/INFECTED
+                "infected" : (ID in data["infectedPlayers"]),
                 "immune": False,
                 "suspiscious" : False,
 

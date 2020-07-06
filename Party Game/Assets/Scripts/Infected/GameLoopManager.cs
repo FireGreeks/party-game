@@ -111,7 +111,7 @@ public class GameLoopManager : MonoBehaviour
         infectingUI.SetActive(currentCycleStep == "Infecting");
     }
 
-    IEnumerator UpdateGameInfo(Action nextStep)
+    public IEnumerator UpdateGameInfo(Action nextStep)
     {
         //Get all the info about the current game
         UnityWebRequest webRequest = UnityWebRequest.Get(ServerInfo.RoomURL + "/gameData");

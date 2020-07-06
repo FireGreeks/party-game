@@ -8,7 +8,7 @@ public static class ServerInfo
 {
     //public static string ServerURL = "http://127.0.0.1:8000/SERVER";
     public static string ServerURL = "https://party-game-mobile.herokuapp.com/SERVER";
-    public static string RoomURL;
+    public static string RoomURL = ServerURL + "/H8JK";
     public static bool hasRoom = false;
 
     public static string CDN_URL = "https://cdn.jsdelivr.net/gh/FireGreeks/party-game";

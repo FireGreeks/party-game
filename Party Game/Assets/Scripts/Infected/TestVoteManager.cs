@@ -18,12 +18,16 @@ public class TestVoteManager : MonoBehaviour
     [Space(10)]
     [SerializeField] private GameLoopManager gameLoopManager;
 
-    // Start is called before the first frame update
-    private void OnEnable()
+    private void Start()
     {
         //Setup event listeners
         gameLoopManager.AddEventListener((JSONNode GD) => new KeyValuePair<JSONNode, string>(GD["stepSpecification"], "Conclusion"), OnConclusion);
+    }
 
+    // Start is called before the first frame update
+    private void OnEnable()
+    {
+        gameLoopManager.UpdateGameInfo(Update);
 
         //When enabled, get the images and tests put to vote and display them
         //TO-DO
