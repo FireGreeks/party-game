@@ -10,10 +10,10 @@ import MiniGamesDirector
 
 SERVER = {
     #Server information (Host and Port)
-    "HOST": '127.0.0.1',
-    #"HOST": "0.0.0.0",
-    #"PORT": os.environ.get("PORT", 80),
-    "PORT": 8000,
+    #"HOST": '127.0.0.1',
+    "HOST": "0.0.0.0",
+    "PORT": os.environ.get("PORT", 80),
+    #"PORT": 8000,
 
     "Rooms": {}
 }
