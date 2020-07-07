@@ -35,6 +35,7 @@ public class GameLoopManager : MonoBehaviour
     [SerializeField] private Transform charactersTransform;
 
     [Header("Cycles")]
+    [SerializeField] private GameObject roleDiscoveryUI;
     [SerializeField] private GameObject testVoteUI;
     [SerializeField] private GameObject miniGameManager;
     [SerializeField] private GameObject trialVoteUI;
@@ -105,6 +106,7 @@ public class GameLoopManager : MonoBehaviour
     void StepManagement()
     {
         //Depending on all the info that has been retrieved find out what to display and what to do
+        roleDiscoveryUI.SetActive(currentCycleStep == "RoleDiscovery");
         testVoteUI.SetActive(currentCycleStep == "TestVote");
         miniGameManager.SetActive(currentCycleStep == "Testing");
         trialVoteUI.SetActive(currentCycleStep == "Trial");

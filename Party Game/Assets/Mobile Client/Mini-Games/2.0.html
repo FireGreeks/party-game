@@ -200,8 +200,6 @@
 			<div class="moreInfected">
 				<h2 class="instructions" style="margin-bottom:0">ALONG WITH</h2>
 				<ul class="playersInfected">
-					<li>Samuel</li>
-					<li>Aaron</li>
 				</ul>
 				<h3 class="note"><u>Note:</u> <i>You can see who is infected after by clicking on the icon in the top banner</i></h3>
 			</div>
@@ -345,14 +343,14 @@
 			}
 			
 			//RoleDiscoveryHTML
-			if (player["role"] == "INFECTED") {
-				$("#RoleDiscoveryHTML").find(".isInfected").css("display", "block");
+			if (playerData["role"] == "INFECTED") {
+				$("#RoleDiscoveryHTML").find("#isInfected").css("display", "block");
 				if (gameData["nbOfInfected"] > 1) {
 					var moreInfected = $("#RoleDiscoveryHTML").find(".moreInfected");
 					moreInfected.css("display", "block");
 					
 					gameData["infectedPlayers"].forEach(function(el) {
-						var playerLI = document.createElement("div");
+						var playerLI = document.createElement("li");
 						$(playerLI).html(gameData["Players"][el]["name"]);
 						moreInfected.find(".playersInfected").append(playerLI);
 					})
@@ -360,10 +358,10 @@
 				}
 			}
 			else
-				$("#RoleDiscoveryHTML").find(".isSane").css("display", "block")
+				$("#RoleDiscoveryHTML").find("#isSane").css("display", "block")
 				
 			$("#RoleDiscoveryHTML").find(".confirmVote").addClass("impossible");
-			SetTimeout(function() {
+			setTimeout(function() {
 				$("#RoleDiscoveryHTML").find(".confirmVote").removeClass("impossible");
 			}, 3000);
 		}
@@ -466,6 +464,9 @@
 			
 			else if (gameData["currentCycleStep"] == "Infecting") 
 				varToSend = (playersInfectSuspSelected == -1) ? -1 :$("#InfectingHTML").find(".players").children().eq(playersInfectSuspSelected).attr("id");
+			
+			else if (gameData["currentCycleStep"] == "RoleDiscovery")
+				varToSend = 0;
 			
 			//Post Vote
 			var data = JSON.stringify({"votes": ["SET_DICT", [localStorage.playerID, varToSend]]});

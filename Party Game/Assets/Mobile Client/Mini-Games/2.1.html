@@ -31,12 +31,31 @@
 		var ctx;
 
 		var floorWidth = 0.8; //Percent
+		var constWidth;
 		var startPosY;
 		
 		var ball = [0, 0, 10];
 		var ballSpeed = [0, 0];
 		
 		var floorRotation = 0;
+		var angleOffset = 0;
+		
+		//Offset rotations
+		var offsetAnimationStage = 0; //0 --> None, 1 --> To offset, 2 --> Back to 0°
+		var offsetValue = 0;
+		var timeTo = 0.2;
+		var timeFrom = 1.5;
+		
+		var timeRandomRange = [1000, 5000];
+		var offsetRandomRange = [10, 75]
+		
+		
+		//Plank size animation
+		var timeToSize0 = 90000;
+		
+		
+		var lastUpdate = Date.now();
+		
 		
 		window.onload = function() {
 			c = document.getElementById("can");
@@ -48,6 +67,8 @@
 			startPosY = c.height / 2;
 			ball[0] = c.width / 2;
 			ball[1] = startPosY;
+			
+			constWidth = floorWidth;
 			
 			window.addEventListener('deviceorientation', function(event) {
 				var absolute = event.absolute;
@@ -69,13 +90,56 @@
 		}
 		
 		var xAcc;
+		var f = 0;
+		var f2 = timeToSize0;
 		function update() {
 			
-			var angle = floorRotation * Math.PI / 180;
-			var angleMultiplier = floorRotation / 1000;
+			var now = Date.now();
+			var deltaTime = now - lastUpdate;
+			lastUpdate = now;
+			
+			//Random offset rotations
+			if (offsetAnimationStage == 0) {
+				setTimeout(function() {
+					offsetValue = Math.random() * (offsetRandomRange[1] - offsetRandomRange[0]) + offsetRandomRange[0];
+					offsetValue *= (floorRotation > 0) ? -1 : 1;
+					offsetAnimationStage = 1;	
+					f = 0;
+				}, Math.random() * (timeRandomRange[1] - timeRandomRange[0]) + timeRandomRange[0]);
+				
+				offsetAnimationStage = -1;
+			}
+			
+			else if (offsetAnimationStage == 1) {						
+				f += deltaTime / 1000;
+				angleOffset = offsetValue * f / timeTo;
+				
+				if (Math.abs(angleOffset) > Math.abs(offsetValue)) {
+					offsetAnimationStage = 2;
+					f = timeFrom;
+				}
+			}
+			
+			else if (offsetAnimationStage == 2) {
+				f -= deltaTime / 1000;
+				angleOffset = offsetValue * f / timeFrom;
+				
+				if (Math.abs(angleOffset) < 0.1) {
+					offsetAnimationStage = 0;
+					f = 0;
+				}
+			}
+			
+			//Plank get smaller
+			f2 -= deltaTime;
+			floorWidth = constWidth * f2 / timeToSize0;
 			
 			
-			if (Math.abs((ball[0] - (c.width / 2)) / Math.cos(-angle)) <= c.width * floorWidth / 2) 
+			var angle = (floorRotation + angleOffset) * Math.PI / 180;
+			var angleMultiplier = (floorRotation + angleOffset) / 1000;
+			
+			
+			if (Distance() < c.width * floorWidth / 2 + ball[2]) 
 			{
 				xAcc = Math.sqrt(1 / (Math.tan(angle)**2 + 1)) * angleMultiplier;
 				
@@ -117,6 +181,15 @@
 		
 		function sliderChange(el) {
 			floorRotation = parseInt(el.value);
+		}
+		
+		function Distance() {
+			
+			var a = ball[0] - c.width / 2;
+			var b = ball[1] - startPosY;
+			
+			return Math.sqrt(a*a + b*b);
+			
 		}
 
 		
