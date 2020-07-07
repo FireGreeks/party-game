@@ -124,7 +124,7 @@
 				f -= deltaTime / 1000;
 				angleOffset = offsetValue * f / timeFrom;
 				
-				if ((offsetValue < 0) ? Math.abs(angleOffset) > 0 : Math.abs(angleOffset) < 0) {
+				if ((offsetValue < 0) ? angleOffset > 0 : angleOffset < 0) {
 					offsetAnimationStage = 0;
 					f = 0;
 				}
