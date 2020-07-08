@@ -39,6 +39,9 @@
 		var targetIMG = new Image();
 		var aimIMG = new Image();
 		
+		var aimTime;
+		var aimTransparentOffset;
+		
 		var lastUpdate = Date.now();
 		
 		
@@ -47,17 +50,18 @@
 			ctx = c.getContext("2d");
 			
 			c.width = window.innerWidth * 0.95;
-			c.height = window.innerHeight / 2;			
+			c.height = window.innerHeight * 0.8;			
 			
 			aimSize = c.width * aimSize;
-			aimPosY = aimSize / 2;
+			aimPosY = aimSize / 2 + 5;
 			targetSize = c.width * targetSize;
 			
-			aimIMG = CDN_URL + "/Images/Infected/Tests/Archery/aim.png"
+			aimIMG.src = CDN_URL + "/Images/Infected/Tests/Archery/aim.png"
 			
 			targetIMG.src = CDN_URL + "/Images/Infected/Tests/Archery/target.png";
 			targetIMG.onload = function (e)
-			{							
+			{	
+				Update()
 				OnStart();
 			}
 
@@ -67,46 +71,63 @@
 		var num = 3;
 		function OnStart() {
 			stage = 1;
+			
+			aimTime = 5000;
+			aimTransparentOffset = 2000;
 
-			ctx.font = (c.width / 10) + "px Comic Sans MS";
-			ctx.fillStyle = "red";
+			ctx.font = (c.width * 0.4) + "px courier";
+			ctx.fillStyle = "white";
 			ctx.textAlign = "center";
+			ctx.textBaseline = "middle";
+			
+			ctx.strokeStyle = "black";
+			ctx.lineWidth = 2;
+			
 			timer = setInterval(function() {
-				ctx.clearRect(0, 0, c.width, c.height);
-				ctx.fillText(num, canvas.width/2, canvas.height/2);
+				Update()
+				if (num != -1) {
+					ctx.fillText(num, c.width/2, c.height/2);
+					ctx.strokeText(num, c.width/2, c.height/2);
+				}
 				
 				if (num == "GO")
+					num = -1;
+					
+				else if (num == -1) {
 					clearInterval(timer);
+					stage = 2;
+					window.requestAnimationFrame(Update)
+				}
 					
 				else {
 					num--;
 					if (num == 0)
-						num = "GO!";
+						num = "GO";
 				}
 				
 			}, 1000);
 		}
 		
-		function update() {
+		var f = 0;
+		function Update() {
 			
 			var now = Date.now();
 			var deltaTime = now - lastUpdate;
 			lastUpdate = now;
 			
-			
-			if (stage != 0) {
-				//Draw
-				ctx.drawImage(targetIMG, (c.width / 2) - (targetSize / 2), (c.height / 2) - (targetSize / 2), targetSize, targetSize);
-				ctx.drawImage(aimIMG, (c.width / 2) - (aimSize / 2), aimPosY, aimSize, aimSize);
-				
-				window.requestAnimationFrame(update);
+			ctx.clearRect(0, 0, c.width, c.height);
+			if (stage == 2) {
+				//Calculate
+				f += deltaTime;
+				aimPosY = (c.width / 2) * f / aimTime;
 			}
 			
-			if (stage == 1) {
+			//Draw
+			ctx.drawImage(targetIMG, (c.width / 2) - (targetSize / 2), (c.height / 2) - (targetSize / 2), targetSize, targetSize);
+			ctx.drawImage(aimIMG, (c.width / 2) - (aimSize / 2), aimPosY, aimSize, aimSize);
 
-			}
-			
-			window.requestAnimationFrame();
+			if (stage == 2)
+				window.requestAnimationFrame(Update);
 		}
 
 		
