@@ -1,0 +1,115 @@
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+	<style>
+	
+		body {
+			background-color: #b03070;
+		}
+	
+		#mainTitle {
+			text-align: center;
+			margin-top: 10vh;
+			font-size: 7vw;
+			font-family:courier,arial,helvetica;
+			color: white;
+		}
+	
+	</style>
+</head>
+<body>
+	<h1 id="mainTitle"><u>MOTOR STABILITY TEST</u></h1>
+		
+	<canvas id="can"></canvas>
+	
+	<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+	<script src="https://raw.githack.com/FireGreeks/party-game/master/Party%20Game/Assets/Mobile%20Client/Scripts/ServerCode.js"></script>
+	<script>
+		
+		var c;
+		var ctx;
+
+		var stage = 0; //0 --> Waiting, 1 --> 3,2,1,GO, 2 --> Playing, 3 --> After shot
+		var roundNb = 1;
+		
+		var aimPosY;
+		var aimSize = 0.05;
+		var targetSize = 0.8;
+		
+		var targetIMG = new Image();
+		var aimIMG = new Image();
+		
+		var lastUpdate = Date.now();
+		
+		
+		window.onload = function() {
+			c = document.getElementById("can");
+			ctx = c.getContext("2d");
+			
+			c.width = window.innerWidth * 0.95;
+			c.height = window.innerHeight / 2;			
+			
+			aimSize = c.width * aimSize;
+			aimPosY = aimSize / 2;
+			targetSize = c.width * targetSize;
+			
+			aimIMG = CDN_URL + "/Images/Infected/Tests/Archery/aim.png"
+			
+			targetIMG.src = CDN_URL + "/Images/Infected/Tests/Archery/target.png";
+			targetIMG.onload = function (e)
+			{							
+				OnStart();
+			}
+
+		}
+		
+		var timer;
+		var num = 3;
+		function OnStart() {
+			stage = 1;
+
+			ctx.font = (c.width / 10) + "px Comic Sans MS";
+			ctx.fillStyle = "red";
+			ctx.textAlign = "center";
+			timer = setInterval(function() {
+				ctx.clearRect(0, 0, c.width, c.height);
+				ctx.fillText(num, canvas.width/2, canvas.height/2);
+				
+				if (num == "GO")
+					clearInterval(timer);
+					
+				else {
+					num--;
+					if (num == 0)
+						num = "GO!";
+				}
+				
+			}, 1000);
+		}
+		
+		function update() {
+			
+			var now = Date.now();
+			var deltaTime = now - lastUpdate;
+			lastUpdate = now;
+			
+			
+			if (stage != 0) {
+				//Draw
+				ctx.drawImage(targetIMG, (c.width / 2) - (targetSize / 2), (c.height / 2) - (targetSize / 2), targetSize, targetSize);
+				ctx.drawImage(aimIMG, (c.width / 2) - (aimSize / 2), aimPosY, aimSize, aimSize);
+				
+				window.requestAnimationFrame(update);
+			}
+			
+			if (stage == 1) {
+
+			}
+			
+			window.requestAnimationFrame();
+		}
+
+		
+	</script>
+</body>
+</html>

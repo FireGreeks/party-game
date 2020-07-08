@@ -1,0 +1,49 @@
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+	<style>
+	
+		body {
+			background-color: #b03070;
+		}
+	
+		#mainTitle {
+			text-align: center;
+			margin-top: 10vh;
+			font-size: 7vw;
+			font-family:courier,arial,helvetica;
+			color: white;
+		}
+	
+	</style>
+</head>
+<body onclick="OnClick()">
+	<h1 id="mainTitle"><u>SPEED TEST</u></h1>
+
+	<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+	<script src="https://raw.githack.com/FireGreeks/party-game/master/Party%20Game/Assets/Mobile%20Client/Scripts/ServerCode.js"></script>
+	<script>
+		
+		var nbClick = 0;
+		var clickToStepRatio = 15;
+		var nbSteps = 0;
+	
+		function OnClick() {
+			nbClick++;
+			
+			if (nbClick >= clickToStepRatio) {
+				nbClick = 0;
+				console.log("Step")
+				
+				//Take step
+				nbSteps++;
+				data = JSON.stringify({"roundResults":  ["SET_DICT", [localStorage.playerID, nbSteps]]})
+				PostRequest(GetRoomPath() + "/AlterGameData", data, function(res) {
+					//Do something
+				});
+			}
+		}
+	
+	</script>
+</body>
+</html>

@@ -36,6 +36,7 @@
 		
 		var ball = [0, 0, 10];
 		var ballSpeed = [0, 0];
+		var dead = false;
 		
 		var floorRotation = 0;
 		var angleOffset = 0;
@@ -47,7 +48,7 @@
 		var timeFrom = 1.5;
 		
 		var timeRandomRange = [1000, 5000];
-		var offsetRandomRange = [10, 75]
+		var offsetRandomRange = [10, 45]
 		
 		
 		//Plank size animation
@@ -139,7 +140,7 @@
 			var angleMultiplier = (floorRotation + angleOffset) / 1000;
 			
 			
-			if (Distance() < c.width * floorWidth / 2 + ball[2]) 
+			if (Distance() < c.width * floorWidth / 2 + ball[2] && !dead) 
 			{
 				xAcc = Math.sqrt(1 / (Math.tan(angle)**2 + 1)) * angleMultiplier;
 				
@@ -155,6 +156,8 @@
 			}
 			else
 			{
+				dead = true;
+				
 				ballSpeed[0] += xAcc;
 				ballSpeed[1] += 1;
 				

@@ -62,6 +62,7 @@ def SetupGames(gameID, data, room):
         data["currentTestID"] = 0 #0 : None, 1 : ....,, 2 : ........, etc.
         data["presentedTests"] = ["Test1", "Test2"]
         data["results"] = {}
+        data["roundResults"] = {}
 
         #Voting Management
         data["votes"] = {}
